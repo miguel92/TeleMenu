@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <h1>Bienvenido a TeleMen&uacute;</h1>
+
+    </div>
+</div>
+<br/>
+<div class="jumbotron text-center">
+  <h1> &iquest; Tienes hambre &quest;</h1>
+  <img style="border-radius:10px; margin-bottom:20px" src="static/img/burguer1.jpg" width="70%"></img>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Quiero Pedir YA</a></p>
+
+
+    <p>{{datos}}</p>
+
+
+</div>
+<br/>
+<br/>
+
+
+
+        <script type="text/javascript">
+            window.onload = function() {
+                if(!window.location.hash) {
+                    window.location = window.location + '#loaded';
+                    window.location.reload();
+                }
+            }
+        </script>
+
+{% endblock content %}
