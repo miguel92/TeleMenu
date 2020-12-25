@@ -1,5 +1,6 @@
 from flask import Flask,render_template, request, redirect, url_for,session
-from models import ConnectFirebase, Usuario, Menu
+from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
+import firebase
 
 class Humano(): #Creamos la clase Humano
     def __init__(self, edad, nombre): #Definimos el parámetro edad y nombre
@@ -35,8 +36,9 @@ class Login():
                     db = firebase.database()
                     user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
                     clave = list(user_by_id)[0]
+                    
                    
-                    session['user'] = user_id
+                    session['user'] = clave
                     session['rol'] = user_by_id[clave]['rol']
 
                     url[0] = 'wb.html'
@@ -112,3 +114,32 @@ class AdminMenus():
                 message="No se ha podido crear"
                 url[1] = message
         return url
+
+class misPedidos():
+    def getMisPedidos(estado):
+        user_id = session['user']
+        firebase = ConnectFirebase().firebase
+        pedido = Pedido.getPedidos(user_id, firebase, estado)
+        return pedido
+    def deletePedido(id_pedido):
+        firebase = ConnectFirebase().firebase
+        Pedido().deletePedido(id_pedido,firebase)
+    def crearPedido(pedido, id_restaurante):
+        user_id = session['user']
+        firebase = ConnectFirebase().firebase
+        Pedido().crearPedido(pedido, firebase, id_restaurante, user_id)
+        
+class listarRestaurantes():
+    def getListaRestaurantes():
+        firebase = ConnectFirebase().firebase
+        restaurantes = Restaurante.getRestaurantes(firebase)
+        return restaurantes
+    def getListaRestaurantesBusqueda(request):
+        firebase = ConnectFirebase().firebase
+        texto = reques.form['inputSearch']
+        return Restaurante.getRestaurantesBusqueda(texto, firebase)
+    def getListaMenusRestaurante(id_restaurante):
+        firebase = ConnectFirebase().firebase
+        menus = Restaurante.getMenusRestaurante(id_restaurante, firebase)
+        return menus
+        

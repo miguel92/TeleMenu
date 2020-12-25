@@ -15,9 +15,10 @@
 # [START gae_python38_render_template]
 import datetime
 from views import Humano
-from views import Login,Registro,AdminMenus
+from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes
 from flask import Flask,render_template, request, redirect, url_for,session
-from models import ConnectFirebase
+from models import ConnectFirebase, Pedido
+#import firebase
 
 app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'esto-es-una-clave-muy-secreta'
@@ -30,9 +31,47 @@ def root():
     usuario = Humano.hola()
     return render_template('wb.html', datos=usuario)
 
-@app.route('/search')
-def search():
-    return render_template('search.html', busqueda = None)
+@app.route('/searchLista')
+def searchLista():
+    restaurantes = listarRestaurantes.getListaRestaurantes()
+    return render_template('searchLista.html', datos = restaurantes)
+
+@app.route('/pedidos')
+def pedidos():
+    return render_template('pedidos.html', datos=None)
+
+@app.route('/pedidosPendientes')
+def pedidosPendientes():
+    pedidos = misPedidos.getMisPedidos("pendiente")
+    return render_template('pedidosPendientes.html', datos=pedidos)
+
+@app.route('/pedidosAnteriores')
+def pedidosAnteriores():
+    pedidos = misPedidos.getMisPedidos("terminado")
+    pedidosLista = list(pedidos)
+    if (pedidosLista.__len__() > 0):
+        return render_template('pedidosAnteriores.html', datos=pedidos)
+    else:
+        return render_template('pedidosAnteriores.html', datos=None)
+
+@app.route('/borrarPedido/<id_pedido>', methods=["GET", "POST"])
+def borrarPedido(id_pedido):
+    misPedidos.deletePedido(id_pedido)
+    return redirect(url_for('pedidosAnteriores'))
+ 
+@app.route('/listarMenusRestauranteWeb/<id_restaurante>', methods=["GET", "POST"])
+def listarMenusRestauranteWeb(id_restaurante):
+    menus = listarRestaurantes.getListaMenusRestaurante(id_restaurante)
+    if (menus.__len__() > 0):
+        pedido = request.get_json()
+        if (pedido is not None):
+            misPedidos.crearPedido(pedido, id_restaurante)
+        
+        return render_template('listaMenusRestaurante.html', datos=menus)
+    else:
+        return render_template('listaMenusRestaurante.html', datos=None)
+    
+       
 
 @app.route("/signup", methods=["GET", "POST"])
 def show_signup_form():
@@ -65,6 +104,11 @@ def logout():
 
 @app.route('/listarMenu')
 def listarMenu():
+    menus = AdminMenus.getLista()
+    return render_template('admin/listarMenus.html', datos = menus)
+
+@app.route('/listarMenusRestaurante')
+def listarMenusRestaurante():
     menus = AdminMenus.getLista()
     return render_template('admin/listarMenus.html', datos = menus)
 

@@ -53,8 +53,13 @@
 
                 </li>
                 <li>
-                	<a style="color:white" href="/search"> <span class="glyphicon glyphicon-search icono_enlace" aria-hidden="true"></span>Buscar Restaurantes</a>
+                	<a style="color:white" href="/searchLista"> <span class="glyphicon glyphicon-search icono_enlace" aria-hidden="true"></span>Buscar Restaurantes</a>
                 </li>
+                {% if session['user'] %}
+                <li>
+                   <a href="/pedidos"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
+                </li>
+                {% endif %}
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -63,7 +68,7 @@
                 {% if session['user'] %}
                 <li>
                    <a href="/logout"> <span class="glyphicon glyphicon-log-out icono_enlace" aria-hidden="true"></span> Logout</a>
-                </li>
+                </li>          
                                 <!-- Solo visible para administradores del sitio -->
                 {% if session['rol'] == 'administrador' %}
                 <li>

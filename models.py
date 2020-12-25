@@ -1,4 +1,6 @@
 import pyrebase
+import firebase
+import time
 
 class ConnectFirebase():
     config = {
@@ -42,3 +44,40 @@ class Menu():
     def createMenu(self,data,firebase):
         db = firebase.database()
         db.child("Menus").push(data)
+        
+class Pedido():
+    def getPedidos(user_id,firebase,estado):
+        db = firebase.database()
+        #cliente = db.child("Pedidos").order_by_child("Cliente").equal_to(user_id)
+        pedidos = db.child("Pedidos").order_by_child("Estado").equal_to(estado).get().val()
+        return pedidos
+    def deletePedido(self,id_pedido,firebase):
+        db = firebase.database()
+        db.child("Pedidos").child(id_pedido).remove()
+    def crearPedido(self,pedido, firebase, id_restaurante, user_id):
+        db = firebase.database()
+        now = time.strftime("%d/%m/%y")
+        hora = time.strftime("%I:%M:%S")
+        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido['pedido'], "Restaurante": id_restaurante}
+        db.child("Pedidos").push(data)
+        
+class Restaurante():
+    def getRestaurantes(firebase):
+        db = firebase.database()
+        restaurantes = db.child("Restaurantes").get().val()
+        return restaurantes
+    def getRestaurantesBusqueda(texto, firebase):
+        db = firebase.database()
+        todosRestaurantes = db.child("Restaurantes").get().val()
+        busquedaRestaurantes = []
+        for key, value in datos.items():
+            if value['Nombre'] in texto:
+                busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
+            elif value['Descripcion'] in texto:
+                busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
+        return busquedaRestaurantes
+    def getMenusRestaurante(id_restaurante, firebase):
+        db = firebase.database()
+        menus = db.child("Menus").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
+        return menus
+        
