@@ -1,6 +1,10 @@
 import pyrebase
 import firebase
 import time
+import requests
+from geopy.geocoders import Nominatim
+from googleplaces import GooglePlaces, types, lang
+import gmaps
 
 class ConnectFirebase():
     config = {
@@ -22,7 +26,7 @@ class Usuario():
         db = firebase.database()
         user_by_id = db.child("Usuarios").order_by_child("user_id").equal_to(user_id).get()
         return users_by_id
-    
+
     def listarUsuarios(self,firebase):
         db = firebase.database()
         usuarios = db.child("Usuarios").get().val()
@@ -39,7 +43,14 @@ class Usuario():
         db = firebase.database()
         usuario = db.child("Usuarios").order_by_key().equal_to(id_usuario).get().val()
         return usuario
-    
+    def getCoordDireccion(user_id, firebase):
+        db = firebase.database()
+        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        usuarioLista = list(usuario.values())
+        direccion = usuarioLista[0]['direccion']
+        geolocator = Nominatim(user_agent="building-an-app-1")
+        location = geolocator.geocode(direccion)
+        return location
 
 class Menu():
     def crearMenu(data,firebase):
@@ -105,3 +116,24 @@ class Restaurante():
         db = firebase.database()
         res = db.child("Restaurantes").order_by_child("correo").equal_to(correo).get().val()
         return res    
+    def getRestaurantesCercanosMapa(user_id, firebase):
+        db = firebase.database()
+        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        usuarioLista = list(usuario.values())
+        direccion = usuarioLista[0]['direccion']
+        geolocator = Nominatim(user_agent="building-an-app-1")
+        location = geolocator.geocode(direccion)
+        
+        api_key = 'AIzaSyD-xb4MI_tuLrsw8jQaivU5_QcgiYJLWGg'
+        
+        google_places = GooglePlaces(api_key)
+        query_result = google_places.nearby_search(
+                lat_lng={'lat': location.latitude, 'lng': location.longitude}, keyword='Restaurante',
+                radius=30, types=[types.TYPE_RESTAURANT])
+        
+        return query_result.places
+    def getKeyRestaurante(firebase, nombre):
+        db = firebase.database()
+        restaurante = db.child("Restaurantes").order_by_child("Nombre").equal_to(nombre).get().val()
+        restauranteKey = list(restaurante.keys())[0]
+        return restauranteKey
