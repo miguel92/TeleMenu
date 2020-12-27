@@ -142,4 +142,16 @@ class listarRestaurantes():
         firebase = ConnectFirebase().firebase
         menus = Restaurante.getMenusRestaurante(id_restaurante, firebase)
         return menus
+    def getRestaurantesCercanosMapa():
+        user_id = session['user']
+        firebase = ConnectFirebase().firebase
+        return Restaurante.getRestaurantesCercanosMapa(user_id, firebase)
+    def getKeyRestaurante(nombre):
+        firebase = ConnectFirebase().firebase
+        return Restaurante.getKeyRestaurante(firebase, nombre)
+class usuario():
+    def getCoordDireccion():
+        user_id = session['user']
+        firebase = ConnectFirebase().firebase
+        return Usuario.getCoordDireccion(user_id, firebase)         
         
