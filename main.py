@@ -14,7 +14,6 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Humano
 from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios
 from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Pedido
@@ -24,12 +23,7 @@ app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'esto-es-una-clave-muy-secreta'
 @app.route('/')
 def root():
-    usuarios = ["adasd",
-                   "manuel",
-                   "pepe",
-                   ]
-    usuario = Humano.hola()
-    return render_template('wb.html', datos=usuario)
+    return render_template('wb.html', datos=None)
 
 @app.route('/searchLista')
 def searchLista():

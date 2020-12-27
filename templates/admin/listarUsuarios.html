@@ -23,8 +23,10 @@
 	        	
 	        <td>
 	      
-	        	<a href="/editarUsuario/{{ key }}"><i class="fas fa-edit"></i></a>
-	        {% if value['rol'] == "usuario" %}
+
+	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
+	        {% if value['rol'] != "administrador" %}
+
 	        	<a href="/borrarUsuario/{{ key }}"><i class="fas fa-trash"></i></a>
 	        {% endif %}
 	        </td>

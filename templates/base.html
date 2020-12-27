@@ -56,9 +56,11 @@
                 	<a style="color:white" href="/searchLista"> <span class="glyphicon glyphicon-search icono_enlace" aria-hidden="true"></span>Buscar Restaurantes</a>
                 </li>
                 {% if session['user'] %}
-                <li>
-                   <a href="/pedidos"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
-                </li>
+                {% if session['rol'] == 'restaurante' %}
+	                <li>
+	                   <a href="/pedidos"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
+	                </li>
+                 {% endif %}
                 {% endif %}
 
             </ul>
