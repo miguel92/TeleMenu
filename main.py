@@ -51,9 +51,7 @@ def mapaRestaurantesCercanos():
         nombre = unicodedata.normalize('NFD', mark.name)
         nombre = nombre.encode("utf8").decode("ascii","ignore")
         key = listarRestaurantes.getKeyRestaurante(nombre)
-        #iframe = "Restaurante: " + nombre
         html = folium.Html('<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>', script=True)
-        #iframe = branca.element.IFrame(html, width=300, height=600)
         folium.Marker(
             name = "hola",
             location=lat_lng,
