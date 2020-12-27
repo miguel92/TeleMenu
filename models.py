@@ -27,6 +27,11 @@ class Usuario():
         db = firebase.database()
         usuarios = db.child("Usuarios").get().val()
         return usuarios
+    
+    def updateUsuario(self,id_usuario,data,firebase):
+        db = firebase.database()
+        return db.child("Usuarios").child(id_usuario).update(data)
+    
     def deleteUsuario(self,id_usuario,firebase):
         db = firebase.database()
         db.child("Usuarios").child(id_usuario).remove()

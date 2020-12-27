@@ -105,6 +105,17 @@ def listarUsuarios():
     datos = AdminUsuarios.getListaUsuarios()
     return render_template('admin/listarUsuarios.html', datos = datos)
     
+@app.route('/editarUsuario/<id_usuario>', methods=["GET", "POST"])
+def editarUsuario(id_usuario):
+    usuario = AdminUsuarios.get(id_usuario)
+    datos = AdminUsuarios.update(request,id_usuario)
+    
+    if datos is not None:
+        return redirect(url_for('listarUsuarios'))
+    
+    return render_template('admin/editarUsuario.html', datos = menus)
+
+    
 @app.route('/borrarUsuario/<id_usuario>', methods=["GET", "POST"])
 def borrarUsuario(id_usuario):
     AdminUsuarios.delete(id_usuario)

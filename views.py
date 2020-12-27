@@ -121,6 +121,15 @@ class AdminUsuarios():
         firebase = ConnectFirebase().firebase
         return Usuario().getUsuario(id_usuario,firebase)
         
+    def update(request,id_usuario):
+        firebase = ConnectFirebase().firebase
+        url = ['admin/editarUsuario.html',"defecto"]
+        
+        if request.method == 'POST':
+            nombre = request.form['inputNombreUsuario']
+            data = {"Nombre":nombre}
+            datos = Menu().updateMenu(id_menu,data,firebase)
+            return datos
 
 
     def delete(id_usuario):
