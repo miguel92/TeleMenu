@@ -75,6 +75,9 @@ class Pedido():
         db.child("Pedidos").push(data)
         
 class Restaurante():
+    def crearRestaurante(data,firebase):
+        db = firebase.database()
+        db.child("Restaurantes").push(data)
     def getRestaurantes(firebase):
         db = firebase.database()
         restaurantes = db.child("Restaurantes").get().val()
