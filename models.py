@@ -96,4 +96,7 @@ class Restaurante():
         db = firebase.database()
         menus = db.child("Menus").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
         return menus
-        
+    def getRestauranteByCorreo(self,correo, firebase):
+        db = firebase.database()
+        res = db.child("Restaurantes").order_by_child("correo").equal_to(correo).get().val()
+        return res    

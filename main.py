@@ -131,21 +131,21 @@ def listarMenusRestaurante():
 @app.route('/crearMenu',methods=["GET", "POST"])
 def crearMenu():
     datos = AdminMenus().create(request)
-    
+    listaRes = listarRestaurantes.getListaRestaurantes()
     if datos[0]=="listarMenu.html":
         return redirect(url_for('listarMenu'))
     else:
-        return render_template(datos[0], datos = datos[1])
+        return render_template(datos[0], datos = datos[1], datos2=listaRes)
 
 @app.route('/editarMenu/<id_menu>', methods=["GET", "POST"])
 def editarMenu(id_menu):
     menus = AdminMenus.get(id_menu)
     datos = AdminMenus.update(request,id_menu)
-    
+    listaRes = listarRestaurantes.getListaRestaurantes()
     if datos is not None:
         return redirect(url_for('listarMenu'))
     
-    return render_template('admin/editarMenu.html', datos = menus)
+    return render_template('admin/editarMenu.html', datos = menus, datos2=listaRes)
 
 @app.route('/borrarMenu/<id_menu>', methods=["GET", "POST"])
 def borrarMenu(id_menu):

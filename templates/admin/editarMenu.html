@@ -7,11 +7,63 @@
         <form class="form-horizontal" role="form" action="" method="post">
         	{%for key,value in datos.items()%}
             <div class="form-group">
-                <label for="inputNombreMenu" class="col-sm-3 control-label">Nombre</label>
+                <label for="nombrePlato" class="col-sm-3 control-label">Nombre</label>
                 <div class="col-sm-6">
-                    <input type="text" class="form-control" name="inputNombreMenu" id="inputNombreMenu" placeholder="Nombre" value="{{ value['Nombre'] }}">
+                    <input type="text" class="form-control" name="nombrePlato" id="nombrePlato" placeholder="Nombre" value="{{ value['Nombre'] }}">
                 </div>
             </div>
+            
+                        <div class="form-group">
+                <label for="ingredientes" class="col-sm-3 control-label">Ingredientes</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="ingredientes" id="ingredientes" placeholder="Lo que lleva el plato" value="{{ value['Ingredientes'] }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+			  
+			  <label class="col-sm-3 control-label" for="tipoPlato">Tipo de comida</label>
+			  <div class="col-sm-6">
+			  <select class="form-control" id="tipoPlato" name="tipoPlato">
+			    <option value="Mexicana">Mexicana</option>
+			   	<option value="Italiana">Italiana</option>
+			    <option value="India">India</option>
+			    <option value="China">China</option>
+			    <option value="Japonesa">Japonesa</option>
+			    <option value="Espa&ntilde;ola">Espa&ntilde;ola</option>
+			    <option value="Libanesa">Libanesa</option>
+			    <option value="Tailandesa">Tailandesa</option>
+			    <option value="Americana">Americana</option>
+			  </select>
+			   <input id="tipoPlatoValue" type="hidden" value="{{ value['Tipo'] }}" name="tipoPlatoValue">
+			  </div>
+			</div>
+
+            <div class="form-group">
+                <label for="precio" class="col-sm-3 control-label">Precio del plato</label>
+                <div class="col-sm-6">
+                    <input step="0.01" type="number" class="form-control" name="precio" id="precio" placeholder="Precio en euros" value="{{ value['Precio'] }}">
+                </div>
+            </div>
+            {% if session['rol'] == 'administrador'%}
+            <div class="form-group">
+				  <label class="col-sm-3 control-label" for="idRestaurante">Restaurante</label>
+				  <div class="col-sm-6">
+					  <select class="form-control" id="idRestaurante" name="idRestaurante">
+			            {% for key, value in datos2.items() %}
+								    <option value="{{key}}">{{value['Nombre']}}</option>
+			            {% endfor %}
+            		  </select>
+				  </div>
+			</div>
+			{% endif%}
+			<input id="idRestauranteValue" type="hidden" value="{{ value['Restaurante'] }}" name="idRestauranteValue">
+            <div class="custom-file">
+	              		<label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
+					    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
+					    <div class="invalid-feedback">Example invalid custom file feedback</div>
+			</div>
+			
             <div class="form-group text-center">
                 <button type="submit" value="submit" class="btn btn-warning">Actualizar</button>
                 <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
@@ -20,4 +72,9 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+	window.onload = function() {
+		alert("hola");
+	};
+</script>
 {% endblock %}

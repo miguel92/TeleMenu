@@ -12,14 +12,11 @@ class Login():
             password = request.form['pass']
             next = request.args.get('next', None)
             
-            print(correo)
-            print(password)
             if next:
                 url[0]='next'
                 
             auth = firebase.auth()
             # Log the user in
-            
             try:
                     user = auth.sign_in_with_email_and_password(correo, password)
                     user = auth.refresh(user['refreshToken'])
@@ -27,12 +24,18 @@ class Login():
                     
                     db = firebase.database()
                     user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
-                    clave = list(user_by_id)[0]
-                    
+                    clave = list(user_by_id)[0]                   
                    
                     session['user'] = clave
                     session['rol'] = user_by_id[clave]['rol']
 
+                    if session['rol'] == "restaurante":
+                        res = Restaurante().getRestauranteByCorreo(correo,firebase)
+                        res = list(res)[0]
+                        session['id_restaurante'] = res
+                    else:
+                        session['id_restaurante'] = None
+                        
                     url[0] = 'wb.html'
             except:
                     message = "Correo o password invalidos"
@@ -150,8 +153,19 @@ class AdminMenus():
         url = ['admin/editarMenu.html',"defecto"]
         
         if request.method == 'POST':
-            nombre = request.form['inputNombreMenu']
-            data = {"Nombre":nombre}
+            nombre = request.form['nombrePlato']
+            precio = request.form['precio']
+            ingredientes = request.form['ingredientes']
+            tipoPlato = request.form['tipoPlato']
+            
+            # FOTO DEL PLATO PARTE DE HAMZA
+            
+            if session['id_restaurante']:
+                id_res = session['id_restaurante']
+            else:
+                id_res = request.form['idRestaurante']
+                
+            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : "urlFoto","Restaurante": id_res}
             datos = Menu().updateMenu(id_menu,data,firebase)
             return datos
 
@@ -163,8 +177,18 @@ class AdminMenus():
         url = ['admin/crearMenu.html',None]
         
         if request.method == 'POST':
-            nombre = request.form['inputNombreMenu']
-            data = {"Nombre":nombre}
+            nombre = request.form['nombrePlato']
+            precio = request.form['precio']
+            ingredientes = request.form['ingredientes']
+            tipoPlato = request.form['tipoPlato']
+            
+            # FOTO DEL PLATO PARTE DE HAMZA
+            
+            if session['id_restaurante']:
+                id_res = session['id_restaurante']
+            else:
+                id_res = request.form['idRestaurante']
+            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : "urlFoto", "Restaurante": id_res}
 
             try:
                 Menu().createMenu(data,firebase)
