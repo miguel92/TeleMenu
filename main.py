@@ -15,7 +15,7 @@
 # [START gae_python38_render_template]
 import datetime
 from views import Humano
-from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes
+from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios
 from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Pedido
 #import firebase
@@ -88,6 +88,28 @@ def show_signup_form():
 def show_register_form():
     datos = Registro.get(request)
     return render_template(datos[0],datos=datos[1])
+
+@app.route("/crearUsuario", methods=["GET", "POST"])
+def crear_usuario():
+    
+    
+    datos = AdminUsuarios().create(request)
+    
+    if datos[0]=="listarUsuarios.html":
+        return redirect(url_for('listarUsuarios'))
+    else:
+        return render_template(datos[0], datos = datos[1])
+
+@app.route('/listarUsuarios')
+def listarUsuarios():
+    datos = AdminUsuarios.getListaUsuarios()
+    return render_template('admin/listarUsuarios.html', datos = datos)
+    
+@app.route('/borrarUsuario/<id_usuario>', methods=["GET", "POST"])
+def borrarUsuario(id_usuario):
+    AdminUsuarios.delete(id_usuario)
+    return redirect(url_for('listarUsuarios'))
+
     
 @app.route('/admin')
 def admin():

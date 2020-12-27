@@ -47,6 +47,11 @@ class Login():
                     url[1] = message;
         return url
 
+## CRUD de USUARIOS
+
+## C de usuarios desde registro
+
+
 class Registro():
     def get(request):
         url = ['register.html',None]
@@ -78,6 +83,50 @@ class Registro():
                     url[1] = message
         
         return url
+
+## C de usuarios desde ventana de administración y RUD de usuarios
+
+class AdminUsuarios():
+    def create(self,request):
+        url = ['admin/crearUsuario.html',None]
+        firebase = ConnectFirebase().firebase
+
+        if request.method == 'POST':
+            correo = request.form['correo']
+            password1 = request.form['pass1']
+            password2 = request.form['pass2']
+            direccion = request.form['direccion']
+            telefono = request.form['telefono']
+                
+            auth = firebase.auth()
+            
+            # Log the user in
+            try:
+                    user = auth.create_user_with_email_and_password(correo, password1)
+                    user_id = user['idToken']
+                    data = {"user_id":user_id, "correo": correo,"password": password1, "direccion": direccion, "telefono":telefono, "rol" : "usuario"}
+                    Usuario.crearUsuario(data,firebase)
+                    url[0] = 'admin/main.html'
+            except:
+                    message = "Se ha producido un error"
+                    url[1] = message
+        
+        return url
+    
+    def getListaUsuarios():
+        firebase = ConnectFirebase().firebase
+        return Usuario().listarUsuarios(firebase)
+    
+    def getUsuario(id_usuario):
+        firebase = ConnectFirebase().firebase
+        return Usuario().getUsuario(id_usuario,firebase)
+        
+
+
+    def delete(id_usuario):
+        firebase = ConnectFirebase().firebase
+        Usuario().deleteUsuario(id_usuario,firebase)
+
 
 class AdminMenus():
     def getLista():
