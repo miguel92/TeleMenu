@@ -16,7 +16,12 @@
 	        <td>
 	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
 	        	<a href="/borrarMenu/{{ key }}"><i class="fas fa-trash"></i></a>
-	        </td>
+	 
+			    <a class="twitter-share-button"
+		 		 href="https://twitter.com/intent/tweet?text=Acude%20a%20nuestro%20restaurante%20a%20probar%20nuestro%20menu%3A%0A{{value['Nombre']}}%20&url={{request.url}}"
+		 	 	data-size="large">
+				<i class="fab fa-twitter-square" style="font-size: 16px"></i></a>  </td>
+				
 	      </tr>
 	      </tr>
 	     {%endfor%}
