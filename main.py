@@ -19,8 +19,6 @@ from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Pedido
 import folium
 import unicodedata
-import branca
-#import firebase
 
 app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'esto-es-una-clave-muy-secreta'
