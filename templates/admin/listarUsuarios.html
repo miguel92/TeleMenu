@@ -1,0 +1,40 @@
+{% extends "admin/main.html" %}
+{% block body %}
+
+	<h3>Tabla de muestra</h3>
+	  <table class="table">
+	    <thead>
+	      <tr>
+	        <th>Correo elect.</th>
+	        <th>Direcci&oacute;n</th>
+	        <th>Rol en la APP</th>
+	        <th>Tel&eacute;fono</th>
+	        <th>Acciones</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	    {% for key, value in datos.items() %}
+	      <tr>
+	        <td>{{value['correo']}}</td>
+	        <td>{{value['direccion']}}</td>
+	        <td>{{value['rol']}}</td>
+	        <td>{{value['telefono']}}</td>
+	       
+	        	
+	        <td>
+	      
+	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
+	        {% if value['rol'] == "usuario" %}
+	        	<a href="/borrarUsuario/{{ key }}"><i class="fas fa-trash"></i></a>
+	        {% endif %}
+	        </td>
+	        
+	     
+	      </tr>
+	      </tr>
+	     {%endfor%}
+	    </tbody>
+	  </table>
+
+
+{% endblock %}

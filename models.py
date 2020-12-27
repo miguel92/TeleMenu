@@ -20,6 +20,19 @@ class Usuario():
         db = firebase.database()
         user_by_id = db.child("Usuarios").order_by_child("user_id").equal_to(user_id).get()
         return users_by_id
+    
+    def listarUsuarios(self,firebase):
+        db = firebase.database()
+        usuarios = db.child("Usuarios").get().val()
+        return usuarios
+    def deleteUsuario(self,id_usuario,firebase):
+        db = firebase.database()
+        db.child("Usuarios").child(id_usuario).remove()
+    def getUsuario(self,id_usuario, firebase):
+        db = firebase.database()
+        usuario = db.child("Usuarios").order_by_key().equal_to(id_usuario).get().val()
+        return usuario
+    
 
 class Menu():
     def crearMenu(data,firebase):
