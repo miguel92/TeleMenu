@@ -72,9 +72,9 @@
         </form>
     </div>
 </div>
-<script type="text/javascript">
-	window.onload = function() {
-		alert("hola");
-	};
-</script>
 {% endblock %}
+
+{% block javascript%}
+	$("#tipoPlato").val($('#tipoPlatoValue').val());
+    $("#idRestaurante").val($('#idRestauranteValue').val());
+{% endblock javascript%}

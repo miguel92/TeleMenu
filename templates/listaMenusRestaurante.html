@@ -29,8 +29,13 @@
 						<p align="right"> <input type="button" value="Confirmar pedido" class="btn btn-success" onclick="crearPedido()"/> </p>
 					</a>
 				</ul>
-		<script>
-		var capa = document.getElementById("listaPedido");
+		</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javascript%}
+	    var capa = document.getElementById("listaPedido");
 		let pedido = []
 		function agregarPedido(nombre){		
 			pedido.push(nombre);
@@ -50,8 +55,4 @@
 		          dataType: "json"
 		          });
 		}
-		</script>
-		</div>
-</div>
-{% endif %}
-{% endblock %}
+{% endblock javascript%}

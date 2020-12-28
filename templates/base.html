@@ -117,9 +117,16 @@
 <!-- Bootstrap Core JavaScript -->
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript">
-    $('.carousel').carousel();
-    $("#tipoPlato").val($('#tipoPlatoValue').val());
-    $("#idRestaurante").val($('#idRestauranteValue').val());
+	$(document).ready(function(){
+		if(!window.location.hash) {
+		    window.location = window.location + '#loaded';
+		    window.location.reload();
+		}
+		
+		{% block javascript%}
+	    
+	    {% endblock javascript%}
+	});
 </script>
 
 </body>
