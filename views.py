@@ -103,51 +103,7 @@ class Registro():
 ## C de usuarios desde ventana de administración y RUD de usuarios
 
 class AdminUsuarios():
-    def create(self,request):
-        url = ['admin/crearUsuario.html',None]
-        firebase = ConnectFirebase().firebase
 
-        if request.method == 'POST':
-            nombre = request.form['nombre']
-            correo = request.form['correo']
-            password1 = request.form['pass1']
-            password2 = request.form['pass2']
-            direccion = request.form['direccion']
-            telefono = request.form['telefono']
-            
-            next = request.args.get('next', None)           
-            
-            tipoUsuario = request.form['tipoUsuario']
-            auth = firebase.auth()
-            
-             # Log the user in
-            try:
-                if password1 == password2:
-                    user = auth.create_user_with_email_and_password(correo, password1)
-                    user_id = user['idToken']
-                    data = {"Nombre": nombre,"user_id":user_id, "correo": correo, "direccion": direccion, "telefono":telefono,"rol":"cliente"}
-
-                    if tipoUsuario == 'restaurante':
-                        data['rol'] = "restaurante"
-                        descripcion = request.form['descripcion']
-                        nombreRes = request.form['nombreRestaurante']
-                        
-                        #AQUI VA LA PARTE DEL LOGO -> HAMZA
-                        
-                        data2 = {"Nombre": nombreRes ,"correo": correo, "descripcion":descripcion, "logo" : "urlPlaceholder","direccion": direccion, "telefono":telefono}
-                        Restaurante.crearRestaurante(data2,firebase)
-                        
-                    Usuario.crearUsuario(data,firebase)   
-                    url[0] = 'wb.html'
-                else:
-                    message = "La contrase&ntilde;a no es la misma"
-                    url[1] = message    
-            except:
-                    message = "Se ha producido un error"
-                    url[1] = message
-        
-        return url
-    
     def getListaUsuarios():
         firebase = ConnectFirebase().firebase
         return Usuario().listarUsuarios(firebase)
