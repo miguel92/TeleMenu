@@ -11,9 +11,15 @@
 		<div class="row">
 				<ul class="list-group">
 					<a href="#1" class="list-group-item">
-						<h4>{{value['Nombre']}}</h4>
-						<p>{{value['Ingredientes']}}</p>
-						<p>Precio: {{value['Precio']}} </p>
+						<div>
+							<h4>{{value['Nombre']}}</h4>
+							{% set src = url_for('static', filename='') + value["Foto"]%}
+							<img class="centrar_imagen" src="{{src}}">
+						</div>
+						
+						<p><i>{{value['Ingredientes']}}</i></p>
+						<p><strong>Precio:</strong> {{value['Precio']}} </p>
+						
 						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}')" /> </p>
 					</a>
 				</ul>

@@ -15,7 +15,25 @@
 						  <label class="radio-inline"><input type="radio" id="tipo_1" name="tipoUsuario" value="cliente" checked>Cliente</label>
 						  <label class="radio-inline"><input type="radio" id="tipo_2" name="tipoUsuario" value="restaurante">Restaurante</label>
 					  </div>
-				  </div>              
+				  </div>
+				  <div>
+	                <label data-error="wrong" data-success="right" for="nombre">Nombre Usuario</label>
+	                <input type="text" name="nombre" id="nombre" class="form-control validate">
+	              </div>
+				  <div>
+	                <label data-error="wrong" data-success="right" for="correo">Correo electr&oacute;nico</label>
+	                <input type="email" name="correo" id="correo" class="form-control validate">
+	              </div>
+	              <div>
+	                <label data-error="wrong" data-success="right" for="pass1">Contrase&ntilde;a</label>
+	                <input type="password" name="pass1" id="pass1" class="form-control validate">
+	              </div>
+	              
+	              <div>
+	                <label data-error="wrong" data-success="right" for="pass2">Repite Contrase&ntilde;a</label>
+	                <input type="password" name="pass2" id="pass2" class="form-control validate">
+	              </div>
+	              
 	              <div>
 	                <label data-error="wrong" data-success="right" for="direccion">Direcci&oacute;n</label>
 	                <input type="text" name="direccion" id="direccion" class="form-control validate">
@@ -42,9 +60,7 @@
 					  </div>
 	              </div>
 
-				<input type="hidden" name="nombre" id="nombre" value="{{session['nombre']}}">
-				<input type="hidden" name="correo" id="correo" value="{{session['correo']}}">
-				<input type="hidden" name="id" id="id" value="{{session['id']}}">
+	
 	            <div class="d-flex justify-content-center" style="margin-top:20px">
 	              <input type="submit" value="Registrarse" class="btn btn-success">
 	            </div>

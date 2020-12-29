@@ -5,6 +5,7 @@ import requests
 from geopy.geocoders import Nominatim
 from googleplaces import GooglePlaces, types, lang
 import gmaps
+from flask_login import UserMixin
 
 class ConnectFirebase():
     config = {
@@ -17,7 +18,12 @@ class ConnectFirebase():
     def __init__(self):
         self.firebase = pyrebase.initialize_app(self.config)
         
-class Usuario():
+class Usuario(UserMixin):
+    def __init__(self, id_ = None, name = None, email = None, rol = None):
+        self.id = id_
+        self.name = name
+        self.email = email
+        self.rol = rol
     def crearUsuario(data,firebase):
         db = firebase.database()
         db.child("Usuarios").push(data)
@@ -51,6 +57,19 @@ class Usuario():
         geolocator = Nominatim(user_agent="building-an-app-1")
         location = geolocator.geocode(direccion)
         return location
+    @staticmethod
+    def get(user_id):
+        firebase = ConnectFirebase().firebase
+        db = firebase.database()
+        user = db.child("Usuarios").order_by_child("user_id").equal_to(user_id).get().val()
+        
+        if not user:
+            return None
+        clave = list(user)[0] 
+        user = Usuario(
+            id_=user[clave]['user_id'], name=user[clave]['Nombre'], email=user[clave]['correo'], rol=user[clave]['rol']
+        )
+        return user
 
 class Menu():
     def crearMenu(data,firebase):
@@ -137,3 +156,4 @@ class Restaurante():
         restaurante = db.child("Restaurantes").order_by_child("Nombre").equal_to(nombre).get().val()
         restauranteKey = list(restaurante.keys())[0]
         return restauranteKey
+    

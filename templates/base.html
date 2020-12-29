@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <meta name="google-signin-client_id" content="724763817794-ggc2ttdiijonm72qd27s1fjkk3a0sglm.apps.googleusercontent.com">
     <title>TeleMenú</title>
 
 
@@ -72,7 +72,7 @@
   	
                 {% if session['user'] %}
                 <li>
-                   <a href="/logout"> <span class="glyphicon glyphicon-log-out icono_enlace" aria-hidden="true"></span> Logout</a>
+                   <a href="/salir"> <span class="glyphicon glyphicon-log-out icono_enlace" aria-hidden="true"></span> Logout</a>
                 </li>          
                                 <!-- Solo visible para administradores del sitio -->
                 {% if session['rol'] == 'administrador' %}
@@ -83,14 +83,11 @@
                 {% else %}
                 <li>
                 <!--   <a data-toggle="modal" data-target="#modalLoginForm" href=""> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a> -->
-                 <a href="/signup"> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a>
-                </li>
-                <li>
-                   <a href="/register"> <span class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Registrarse</a>
+                 <a href="/login"> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a>
+                 
                 </li>
                 {% endif %}
                 {% endblock %}
-
                 
 
             </ul>
@@ -113,20 +110,21 @@
 
 <!-- jQuery Version 1.11.1 -->
 <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 <!-- Bootstrap Core JavaScript -->
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript">
-$(document).ready(function(){
-	if(!window.location.hash) {
-	    window.location = window.location + '#loaded';
-	    window.location.reload();
-	}
-	
-	{% block javascript%}
-    
-    {% endblock javascript%}
-});
+
+	$(document).ready(function(){
+		if(!window.location.hash) {
+		    window.location = window.location + '#loaded';
+		    window.location.reload();
+		}
+		{% block javascript%}
+	    
+	    {% endblock javascript%}
+	});
+
 </script>
 
 
