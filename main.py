@@ -14,10 +14,11 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios
+from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, usuario
 from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Pedido
-#import firebase
+import folium
+import unicodedata
 
 app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'esto-es-una-clave-muy-secreta'
@@ -30,6 +31,34 @@ def searchLista():
     restaurantes = listarRestaurantes.getListaRestaurantes()
     return render_template('searchLista.html', datos = restaurantes)
 
+@app.route('/map')
+def mapaRestaurantesCercanos():
+    restaurantes = listarRestaurantes.getRestaurantesCercanosMapa()
+    misCoord = usuario.getCoordDireccion()
+    map = folium.Map(
+        left='20%',
+        width=700,
+        height=500,
+        location = [misCoord.latitude, misCoord.longitude],
+        zoom_start = 15
+    )
+    
+    
+    for mark in restaurantes:
+        lat = float(mark.geo_location['lat'])
+        lng = float(mark.geo_location['lng'])
+        lat_lng = (lat,lng)
+        nombre = unicodedata.normalize('NFD', mark.name)
+        nombre = nombre.encode("utf8").decode("ascii","ignore")
+        key = listarRestaurantes.getKeyRestaurante(nombre)
+        html = folium.Html('<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>', script=True)
+        folium.Marker(
+            name = "hola",
+            location=lat_lng,
+            popup=folium.Popup(html, max_width=300, height=500),
+            tooltip="Click aqui"
+        ).add_to(map)
+    return render_template('map.html',map=map._repr_html_())
 @app.route('/pedidos')
 def pedidos():
     return render_template('pedidos.html', datos=None)
@@ -142,21 +171,21 @@ def listarMenusRestaurante():
 @app.route('/crearMenu',methods=["GET", "POST"])
 def crearMenu():
     datos = AdminMenus().create(request)
-    
+    listaRes = listarRestaurantes.getListaRestaurantes()
     if datos[0]=="listarMenu.html":
         return redirect(url_for('listarMenu'))
     else:
-        return render_template(datos[0], datos = datos[1])
+        return render_template(datos[0], datos = datos[1], datos2=listaRes)
 
 @app.route('/editarMenu/<id_menu>', methods=["GET", "POST"])
 def editarMenu(id_menu):
     menus = AdminMenus.get(id_menu)
     datos = AdminMenus.update(request,id_menu)
-    
+    listaRes = listarRestaurantes.getListaRestaurantes()
     if datos is not None:
         return redirect(url_for('listarMenu'))
     
-    return render_template('admin/editarMenu.html', datos = menus)
+    return render_template('admin/editarMenu.html', datos = menus, datos2=listaRes)
 
 @app.route('/borrarMenu/<id_menu>', methods=["GET", "POST"])
 def borrarMenu(id_menu):

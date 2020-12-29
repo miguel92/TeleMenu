@@ -1,7 +1,7 @@
 {% extends "admin/main.html" %}
 {% block body %}
-
-	<h3>Tabla de muestra</h3>
+	{% if datos is not none %}
+	<h3>Tabla de men&uacute;s</h3>
 	  <table class="table">
 	    <thead>
 	      <tr>
@@ -26,6 +26,9 @@
 	     {%endfor%}
 	    </tbody>
 	  </table>
+	  {%else%}
+	  	<h3>No hay men&uacute;s creados</h3>
+	  {% endif %}
 
 
 {% endblock %}

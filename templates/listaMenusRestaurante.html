@@ -5,25 +5,23 @@
 <h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
 {% else %}
 <div class="row">
-	<div class="column">
+	<div class="col-sm-6">
 		<h3>Menus disponibles</h3>
 		{% for key, value in datos.items() %}
 		<div class="row">
-			<div class="col-md-4">
 				<ul class="list-group">
 					<a href="#1" class="list-group-item">
 						<h4>{{value['Nombre']}}</h4>
 						<p>{{value['Ingredientes']}}</p>
+						<p>Precio: {{value['Precio']}} </p>
 						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}')" /> </p>
 					</a>
 				</ul>
-			</div>
 		</div>
 		{%endfor%}
 	  </div>
-	<div class="column" style="position:relative; left:600px; top: -370px;">
+	<div class="col-sm-6">
 		<h3 id="pedido">Tu pedido:</h3>
-		<div class="col-md-4">
 				<ul id="ulListaPedido" class="list-group" style="visibility: hidden;">
 					<a href="#2" class="list-group-item">
 						<p id="haPedido" style="visibility: visible;">A&uacute;n no has pedido nada.</p>
@@ -31,9 +29,13 @@
 						<p align="right"> <input type="button" value="Confirmar pedido" class="btn btn-success" onclick="crearPedido()"/> </p>
 					</a>
 				</ul>
-			</div>
-		<script>
-		var capa = document.getElementById("listaPedido");
+		</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javascript%}
+	    var capa = document.getElementById("listaPedido");
 		let pedido = []
 		function agregarPedido(nombre){		
 			pedido.push(nombre);
@@ -53,8 +55,4 @@
 		          dataType: "json"
 		          });
 		}
-		</script>
-		</div>
-</div>
-{% endif %}
-{% endblock %}
+{% endblock javascript%}

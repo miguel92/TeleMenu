@@ -54,7 +54,7 @@
 		                <textarea class="form-control validate" style="resize:none;" rows="5" id="descripcion" name="descripcion"></textarea>
 	              	</div>
 	              	<div class="custom-file">
-	              		<label class="custom-file-label" for="validatedCustomFile">Logo del restaurante</label>
+	              		<label class="custom-file-label" for="logoRestaurante">Logo del restaurante</label>
 					    <input type="file" name="logoRestaurante" class="custom-file-input" id="logoRestaurante" >
 					    <div class="invalid-feedback">Example invalid custom file feedback</div>
 					  </div>
@@ -77,25 +77,17 @@
 <br/>
 
 
+{% endblock content %}
 
-        <script type="text/javascript">
-            window.onload = function() {
-                if(!window.location.hash) {
-                    window.location = window.location + '#loaded';
-                    window.location.reload();
-                }
-                $("#tipo_1").click(function(){
-                	$('#datosRestaurante').fadeOut( "slow");
-                });
+{% block javascript%}
+			$("#tipo_1").click(function(){
+            	$('#datosRestaurante').fadeOut( "slow");
+            });
                 
-                $("#tipo_2").click(function(){
-                	$('#datosRestaurante').fadeIn( "slow");
-                });
-                
-            }
-            {% if datos%}
+            $("#tipo_2").click(function(){
+             	$('#datosRestaurante').fadeIn( "slow");
+            });
+	        {% if datos%}
               alert("Contraseña equivocada");
             {% endif %}
-        </script>
-
-{% endblock content %}
+{% endblock javascript%}

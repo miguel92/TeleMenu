@@ -60,6 +60,9 @@
 	                <li>
 	                   <a href="/pedidos"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
 	                </li>
+	              	<li>
+	                   <a href="/listarMenusRestaurante"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Men&uacute;s</a>
+	                </li>
                  {% endif %}
                 {% endif %}
 
@@ -114,15 +117,16 @@
 <!-- Bootstrap Core JavaScript -->
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript">
-    $('.carousel').carousel();
+$(document).ready(function(){
+	if(!window.location.hash) {
+	    window.location = window.location + '#loaded';
+	    window.location.reload();
+	}
+	
+	{% block javascript%}
     
-    $("#tipo_1").click(function(){
-    	$('#datosRestaurante').fadeOut( "slow");
-    });
-    
-    $("#tipo_2").click(function(){
-    	$('#datosRestaurante').fadeIn( "slow");
-    });
+    {% endblock javascript%}
+});
 </script>
 
 
