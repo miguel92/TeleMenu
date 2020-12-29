@@ -59,6 +59,8 @@
 			{% endif%}
 			<input id="idRestauranteValue" type="hidden" value="{{ value['Restaurante'] }}" name="idRestauranteValue">
             <div class="custom-file">
+            			{% set src = url_for('static', filename='') + value["Foto"]%}
+						<img class="centrar_imagen" src="{{src}}">
 	              		<label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
 					    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
 					    <div class="invalid-feedback">Example invalid custom file feedback</div>

@@ -16,12 +16,37 @@
 import datetime
 from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, usuario
 from flask import Flask,render_template, request, redirect, url_for,session
-from models import ConnectFirebase, Pedido
+from models import ConnectFirebase, Pedido, Usuario
 import folium
 import unicodedata
 
+# Python standard libraries
+import json
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# Third party libraries
+from flask import Flask, redirect, request, url_for
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from oauthlib.oauth2 import WebApplicationClient
+import requests
+
+# Configuration
+GOOGLE_CLIENT_ID = "724763817794-ggc2ttdiijonm72qd27s1fjkk3a0sglm.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "-FLrj22Pal8oD8X2u2HLfzw3"
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
+
 app = Flask(__name__,static_url_path='/static')
-app.secret_key = 'esto-es-una-clave-muy-secreta'
+app.secret_key = GOOGLE_CLIENT_SECRET
+
 @app.route('/')
 def root():
     return render_template('wb.html', datos=None)
@@ -191,6 +216,139 @@ def editarMenu(id_menu):
 def borrarMenu(id_menu):
     AdminMenus.delete(id_menu)
     return redirect(url_for('listarMenu'))
+
+@app.route('/loginGoogle', methods=["GET", "POST"])
+def loginGoogle():
+    perfil = request.get_json()
+    print(perfil)
+    existe = Login().checkUser(perfil)
+    data = json.dumps({'redirect': existe})
+    return data
+
+
+# User session management setup
+# https://flask-login.readthedocs.io/en/latest
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return "You must be logged in to access this content.", 403
+
+# OAuth2 client setup
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.get(user_id)
+
+@app.route("/login")
+def login():
+    # Find out what URL to hit for Google login
+    google_provider_cfg = get_google_provider_cfg()
+    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+
+    # Use library to construct the request for login and provide
+    # scopes that let you retrieve user's profile from Google
+    request_uri = client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.base_url + "/callback",
+        scope=["openid", "email", "profile"],
+    )
+    return redirect(request_uri)
+
+@app.route("/login/callback")
+def callback():
+    # Get authorization code Google sent back to you
+    code = request.args.get("code")
+
+    # Find out what URL to hit to get tokens that allow you to ask for
+    # things on behalf of a user
+    google_provider_cfg = get_google_provider_cfg()
+    token_endpoint = google_provider_cfg["token_endpoint"]
+
+    # Prepare and send request to get tokens! Yay tokens!
+    token_url, headers, body = client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code,
+    )
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
+    )
+
+    # Parse the tokens!
+    client.parse_request_body_response(json.dumps(token_response.json()))
+
+    # Now that we have tokens (yay) let's find and hit URL
+    # from Google that gives you user's profile information,
+    # including their Google Profile Image and Email
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
+
+    # We want to make sure their email is verified.
+    # The user authenticated with Google, authorized our
+    # app, and now we've verified their email through Google!
+    if userinfo_response.json().get("email_verified"):
+        unique_id = userinfo_response.json()["sub"]
+        users_email = userinfo_response.json()["email"]
+        picture = userinfo_response.json()["picture"]
+        users_name = userinfo_response.json()["given_name"]
+    else:
+        return "User email not available or not verified by Google.", 400
+
+    # Create a user in our db with the information provided
+    # by Google
+    firebase = ConnectFirebase().firebase
+    db = firebase.database()
+        
+    user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(users_email).get().val()
+    
+    session['nombre'] = users_name
+    session['id'] = unique_id
+    session['correo'] = users_email
+     
+       
+    if user_by_id == []:
+        print("usuario no existe")
+        datosGoogle = {"id": unique_id ,"nombre" : users_name, "correo":users_email}
+        session['nombre'] = users_name
+        session['id'] = unique_id
+        session['correo'] = users_email
+        return redirect(url_for("show_register_form"))
+    
+    clave = list(user_by_id)[0]
+    session['rol'] = user_by_id[clave]['rol']
+    session['user'] = users_email
+    user = Usuario(
+        id_=unique_id, name=users_name, email=users_email, rol = user_by_id[clave]['rol']
+    )
+    
+    login_user(user)
+    
+    # Send user back to homepage
+    return redirect(url_for("root"))
+
+@app.route("/salir")
+@login_required
+def salir():
+    logout_user()
+    session.pop('user',None)
+    session.pop('rol',None)
+    session.pop('id',None)
+    session.pop('correo',None)
+    session.clear()
+    return redirect(url_for("root"))
+def get_google_provider_cfg():
+    return requests.get(GOOGLE_DISCOVERY_URL).json()
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

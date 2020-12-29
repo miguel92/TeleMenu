@@ -41,7 +41,18 @@ class Login():
                     message = "Correo o password invalidos"
                     url[1] = message;
         return url
-
+    def checkUser(self,perfil):
+        firebase = ConnectFirebase().firebase
+        db = firebase.database()
+        correo = perfil['profile']['du']
+        user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
+        
+        if user_by_id == []:
+            print("usuario no existe")
+            existe = False
+        return existe    
+        
+            
 ## CRUD de USUARIOS
 
 ## C de usuarios desde registro
@@ -55,8 +66,7 @@ class Registro():
         if request.method == 'POST':
             nombre = request.form['nombre']
             correo = request.form['correo']
-            password1 = request.form['pass1']
-            password2 = request.form['pass2']
+            id = request.form['id']
             direccion = request.form['direccion']
             telefono = request.form['telefono']
             
@@ -67,30 +77,23 @@ class Registro():
             if next:
                 url[0]='next'
                 
-            auth = firebase.auth()
-            
             # Log the user in
             try:
-                if password1 == password2:
-                    user = auth.create_user_with_email_and_password(correo, password1)
-                    user_id = user['idToken']
-                    data = {"Nombre": nombre,"user_id":user_id, "correo": correo, "direccion": direccion, "telefono":telefono,"rol":"cliente"}
+                data = {"Nombre": nombre,"user_id":id, "correo": correo, "direccion": direccion, "telefono":telefono,"rol":"cliente"}
 
-                    if tipoUsuario == 'restaurante':
-                        data['rol'] = "restaurante"
-                        descripcion = request.form['descripcion']
-                        nombreRes = request.form['nombreRestaurante']
-                        
-                        #AQUI VA LA PARTE DEL LOGO -> HAMZA
-                        
-                        data2 = {"Nombre": nombreRes ,"correo": correo, "descripcion":descripcion, "logo" : "urlPlaceholder","direccion": direccion, "telefono":telefono}
-                        Restaurante.crearRestaurante(data2,firebase)
-                        
-                    Usuario.crearUsuario(data,firebase)   
-                    url[0] = 'wb.html'
-                else:
-                    message = "La contrase&ntilde;a no es la misma"
-                    url[1] = message    
+                if tipoUsuario == 'restaurante':
+                    data['rol'] = "restaurante"
+                    descripcion = request.form['descripcion']
+                    nombreRes = request.form['nombreRestaurante']
+                    
+                    #AQUI VA LA PARTE DEL LOGO -> HAMZA
+                    
+                    data2 = {"Nombre": nombreRes ,"correo": correo, "descripcion":descripcion, "logo" : "urlPlaceholder", "direccion": direccion, "telefono":telefono}
+                    Restaurante.crearRestaurante(data2,firebase)
+                    
+                Usuario.crearUsuario(data,firebase)   
+                url[0] = 'wb.html'
+              
             except:
                     message = "Se ha producido un error"
                     url[1] = message
@@ -174,7 +177,12 @@ class AdminMenus():
             else:
                 id_res = request.form['idRestaurante']
                 
-            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : "urlFoto","Restaurante": id_res}
+            if request.form['fotoPlato'] is None:
+                urlFoto = "img/menu_placeholder2.jpg"
+            else:
+                urlFoto = request.form['fotoPlato']     
+                
+            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : urlFoto,"Restaurante": id_res}
             datos = Menu().updateMenu(id_menu,data,firebase)
             return datos
 
@@ -197,7 +205,13 @@ class AdminMenus():
                 id_res = session['id_restaurante']
             else:
                 id_res = request.form['idRestaurante']
-            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : "urlFoto", "Restaurante": id_res}
+               
+            if request.form['fotoPlato'] == "":
+                urlFoto = "img/menu_placeholder2.jpg"
+            else:
+                urlFoto = request.form['fotoPlato']    
+                
+            data = {"Nombre":nombre, "Ingredientes": ingredientes, "Tipo" : tipoPlato, "Precio": precio, "Foto" : urlFoto, "Restaurante": id_res}
 
             try:
                 Menu().createMenu(data,firebase)
