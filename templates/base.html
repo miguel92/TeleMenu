@@ -115,7 +115,17 @@
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript">
     $('.carousel').carousel();
+    
+    $("#tipo_1").click(function(){
+    	$('#datosRestaurante').fadeOut( "slow");
+    });
+    
+    $("#tipo_2").click(function(){
+    	$('#datosRestaurante').fadeIn( "slow");
+    });
 </script>
+
+
 
 </body>
 

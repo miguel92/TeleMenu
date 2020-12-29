@@ -12,15 +12,14 @@
 	    <tbody>
 	    {% for key, value in datos.items() %}
 	      <tr>
-	        <td>{{value['Nombre']}}</td>
-	        <td>
+	        <td>{{value['Nombre']}} <td>
 	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
 	        	<a href="/borrarMenu/{{ key }}"><i class="fas fa-trash"></i></a>
 	 
 			    <a class="twitter-share-button"
-		 		 href="https://twitter.com/intent/tweet?text=Acude%20a%20nuestro%20restaurante%20a%20probar%20nuestro%20menu%3A%0A{{value['Nombre']}}%20&url={{request.url}}"
+		 		 href="https://twitter.com/intent/tweet?text=%C2%A1Acude%20a%20nuestro%20restaurante%20a%20probar%20nuestro%20menu%21%0A{{value['Nombre']}}%0AIngredientes%3A%20{{value['Ingredientes']}}%0ARestaurante%3A%20{{value['Restaurante']}}%0AWeb%3A%20&url={{request.url}}"
 		 	 	data-size="large">
-				<i class="fab fa-twitter-square" style="font-size: 16px"></i></a>  </td>
+				<i class="fab fa-twitter-square" style="font-size: 17px"></i></a>  </td>
 				
 	      </tr>
 	      </tr>

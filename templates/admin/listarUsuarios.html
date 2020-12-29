@@ -5,26 +5,27 @@
 	  <table class="table">
 	    <thead>
 	      <tr>
+	        <th>Nombre</th>
 	        <th>Correo elect.</th>
 	        <th>Direcci&oacute;n</th>
-	        <th>Rol en la APP</th>
 	        <th>Tel&eacute;fono</th>
+	        <th>Rol en la APP</th>
+	        
 	        <th>Acciones</th>
 	      </tr>
 	    </thead>
 	    <tbody>
 	    {% for key, value in datos.items() %}
 	      <tr>
+	        <td>{{value['Nombre']}}</td>
 	        <td>{{value['correo']}}</td>
 	        <td>{{value['direccion']}}</td>
-	        <td>{{value['rol']}}</td>
 	        <td>{{value['telefono']}}</td>
-	       
-	        	
+	    	<td>{{value['rol']}}</td>
 	        <td>
 	      
 
-	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
+	        	<a href="/editarUsuario/{{ key }}"><i class="fas fa-edit"></i></a>
 	        {% if value['rol'] != "administrador" %}
 
 	        	<a href="/borrarUsuario/{{ key }}"><i class="fas fa-trash"></i></a>

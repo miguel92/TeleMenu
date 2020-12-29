@@ -102,21 +102,40 @@ class AdminUsuarios():
         firebase = ConnectFirebase().firebase
 
         if request.method == 'POST':
+            nombre = request.form['nombre']
             correo = request.form['correo']
             password1 = request.form['pass1']
             password2 = request.form['pass2']
             direccion = request.form['direccion']
             telefono = request.form['telefono']
-                
+            
+            next = request.args.get('next', None)           
+            
+            tipoUsuario = request.form['tipoUsuario']
             auth = firebase.auth()
             
-            # Log the user in
+             # Log the user in
             try:
+                if password1 == password2:
                     user = auth.create_user_with_email_and_password(correo, password1)
                     user_id = user['idToken']
-                    data = {"user_id":user_id, "correo": correo,"password": password1, "direccion": direccion, "telefono":telefono, "rol" : "usuario"}
-                    Usuario.crearUsuario(data,firebase)
-                    url[0] = 'admin/main.html'
+                    data = {"Nombre": nombre,"user_id":user_id, "correo": correo, "direccion": direccion, "telefono":telefono,"rol":"cliente"}
+
+                    if tipoUsuario == 'restaurante':
+                        data['rol'] = "restaurante"
+                        descripcion = request.form['descripcion']
+                        nombreRes = request.form['nombreRestaurante']
+                        
+                        #AQUI VA LA PARTE DEL LOGO -> HAMZA
+                        
+                        data2 = {"Nombre": nombreRes ,"correo": correo, "descripcion":descripcion, "logo" : "urlPlaceholder","direccion": direccion, "telefono":telefono}
+                        Restaurante.crearRestaurante(data2,firebase)
+                        
+                    Usuario.crearUsuario(data,firebase)   
+                    url[0] = 'wb.html'
+                else:
+                    message = "La contrase&ntilde;a no es la misma"
+                    url[1] = message    
             except:
                     message = "Se ha producido un error"
                     url[1] = message
@@ -136,9 +155,12 @@ class AdminUsuarios():
         url = ['admin/editarUsuario.html',"defecto"]
         
         if request.method == 'POST':
-            nombre = request.form['inputNombreUsuario']
-            data = {"Nombre":nombre}
-            datos = Menu().updateMenu(id_menu,data,firebase)
+            Nombre = request.form['nombre']
+            direccion = request.form['direccion']
+            telefono = request.form['telefono']
+          
+            data = {"Nombre":Nombre, "direccion":direccion,"telefono":telefono}
+            datos = Usuario().updateUsuario(id_usuario,data,firebase)
             return datos
 
 
