@@ -137,16 +137,15 @@ def show_register_form():
     datos = Registro.get(request)
     return render_template(datos[0],datos=datos[1])
 
-@app.route("/crearUsuario", methods=["GET", "POST"])
-def crear_usuario():
-    
-    
-    datos = AdminUsuarios().create(request)
-    
-    if datos[0]=="listarUsuarios.html":
-        return redirect(url_for('listarUsuarios'))
-    else:
-        return render_template(datos[0], datos = datos[1])
+# SE DESESTIMA C DE USUARIOS EN FAVOR DE OAUTH
+#@app.route("/crearUsuario", methods=["GET", "POST"])
+#def crear_usuario():
+#    datos = AdminUsuarios().create(request)
+#    
+#    if datos[0]=="listarUsuarios.html":
+#        return redirect(url_for('listarUsuarios'))
+#    else:
+#        return render_template(datos[0], datos = datos[1])
 
 @app.route('/listarUsuarios')
 def listarUsuarios():

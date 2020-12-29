@@ -100,7 +100,7 @@ class Registro():
         
         return url
 
-## C de usuarios desde ventana de administración y RUD de usuarios
+## RUD de usuarios
 
 class AdminUsuarios():
 
