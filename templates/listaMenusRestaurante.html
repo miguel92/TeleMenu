@@ -1,64 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
+    <h1><strong>{{ restaurante['Nombre'] }}</strong></h1>
 
-{% if datos == None %}
-<h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
-{% else %}
-<div class="row">
-	<div class="col-sm-6">
-		<h3>Menus disponibles</h3>
-		{% for key, value in datos.items() %}
-		<div class="row">
-				<ul class="list-group">
-					<a href="#1" class="list-group-item">
-						<div>
-							<h4>{{value['Nombre']}}</h4>
-							{% set src = url_for('static', filename='') + value["Foto"]%}
-							<img class="centrar_imagen" src="{{src}}">
-						</div>
-						
-						<p><i>{{value['Ingredientes']}}</i></p>
-						<p><strong>Precio:</strong> {{value['Precio']}} </p>
-						
-						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}')" /> </p>
-					</a>
-				</ul>
-		</div>
-		{%endfor%}
-	  </div>
-	<div class="col-sm-6">
-		<h3 id="pedido">Tu pedido:</h3>
-				<ul id="ulListaPedido" class="list-group" style="visibility: hidden;">
-					<a href="#2" class="list-group-item">
-						<p id="haPedido" style="visibility: visible;">A&uacute;n no has pedido nada.</p>
-						<h4 id="listaPedido"></h4>
-						<p align="right"> <input type="button" value="Confirmar pedido" class="btn btn-success" onclick="crearPedido()"/> </p>
-					</a>
-				</ul>
-		</div>
-</div>
-{% endif %}
+    <h2>{{ restaurante['description'] }}</h2>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <h4>Dirección</h4>
+            <p>{{ restaurante['direccion'] }}</p>
+            {% if tiempo != None %}
+                <h4>Tiempo</h4>
+                <p>{{ tiempo['weather']['descripcion'] }}</p>
+                <p>Temperatura: {{ tiempo['weather']['temperature'] }}ºC</p>
+                <p>Humedad: {{ tiempo['weather']['humidity'] }}%</p>
+                <p/>
+                <h4>Polución</h4>
+                <p>Calidad del aire: {{ tiempo['pollution']['air_quality'] }}</p>
+            {% endif %}
+        </div>
+        {% if datos == None %}
+            <div class="col-sm-6">
+                <h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
+            </div>
+        {% else %}
+            <div class="col-sm-4">
+                <h3>Menus disponibles</h3>
+                {% for key, value in datos.items() %}
+                    <div class="row">
+                        <ul class="list-group">
+                            <a href="#1" class="list-group-item">
+                                <div>
+                                    <h4>{{ value['Nombre'] }}</h4>
+                                    {% set src = url_for('static', filename='') + value["Foto"] %}
+                                    <img class="centrar_imagen" src="{{ src }}">
+                                </div>
+
+                                <p><i>{{ value['Ingredientes'] }}</i></p>
+                                <p><strong>Precio:</strong> {{ value['Precio'] }} </p>
+
+                                <p align="right"><input type="button" value="A&ntilde;adir al pedido"
+                                                        class="btn btn-success"
+                                                        onclick="agregarPedido('{{ value['Nombre'] }}')"/></p>
+                            </a>
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4">
+                <h3 id="pedido">Tu pedido:</h3>
+                <ul id="ulListaPedido" class="list-group" style="visibility: hidden;">
+                    <a href="#2" class="list-group-item">
+                        <p id="haPedido" style="visibility: visible;">A&uacute;n no has pedido nada.</p>
+                        <h4 id="listaPedido"></h4>
+                        <p align="right"><input type="button" value="Confirmar pedido" class="btn btn-success"
+                                                onclick="crearPedido()"/></p>
+                    </a>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
 {% endblock %}
 
-{% block javascript%}
-	    var capa = document.getElementById("listaPedido");
-		let pedido = []
-		function agregarPedido(nombre){		
-			pedido.push(nombre);
-		  	var h1 = document.createElement("h4");
-		  	h1.textContent = nombre;
-		  	document.getElementById("haPedido").style.visibility = "hidden";
-		  	document.getElementById("ulListaPedido").style.visibility = "visible";
-		  	capa.appendChild(h1);
-		}
-		
-		function crearPedido(){
-			$.ajax({
-		          type: "POST",
-		          contentType: "application/json;charset=utf-8",
-		          traditional: "true",
-		          data: JSON.stringify({pedido}),
-		          dataType: "json"
-		          });
-		}
-{% endblock javascript%}
+{% block javascript %}
+    var capa = document.getElementById("listaPedido");
+    let pedido = []
+    function agregarPedido(nombre){
+    pedido.push(nombre);
+    var h1 = document.createElement("h4");
+    h1.textContent = nombre;
+    document.getElementById("haPedido").style.visibility = "hidden";
+    document.getElementById("ulListaPedido").style.visibility = "visible";
+    capa.appendChild(h1);
+    }
+
+    function crearPedido(){
+    $.ajax({
+    type: "POST",
+    contentType: "application/json;charset=utf-8",
+    traditional: "true",
+    data: JSON.stringify({pedido}),
+    dataType: "json"
+    });
+    }
+{% endblock javascript %}

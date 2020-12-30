@@ -1,16 +1,25 @@
 {% extends "admin/main.html" %}
 {% block body %}
+    <div class="col-lg-12 text-center">
+    {% if session['rol'] == 'restaurante' %}
+        <h1>Mi Usuario</h1>
+    {% endif %}
+    {% if session['error'] %}
+        <div class="alert alert-danger">{{ session['error'] }}</div>
+    {% endif %}
+    <h3>Actualizaci&oacute;n de usuarios</h3>
+    <p/>
 
-	<h3>Actualizaci&oacute;n de usuarios</h3>
-	<div class="row">
-    <div class="col-md-12">
-        <form class="form-horizontal" role="form" action="" method="post">
-        	{%for key,value in datos.items()%}
-            <div class="form-group">
-                <label for="inputNombreMenu" class="col-sm-3 control-label">Nombre</label>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Nombre" value="{{ value['Nombre'] }}">
-                </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal" role="form" action="" method="post">
+                {% for key,value in datos.items() %}
+                    <div class="form-group">
+                        <label for="inputNombreMenu" class="col-sm-3 control-label">Nombre</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Nombre"
+                                   value="{{ value['Nombre'] }}">
+                        </div>
             </div>
                <div class="form-group">
                 <label for="inputNombreMenu" class="col-sm-3 control-label">Direcci&oacute;n</label>

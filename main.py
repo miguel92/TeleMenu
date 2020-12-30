@@ -14,8 +14,8 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Login,Registro,AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, usuario
-from flask import Flask,render_template, request, redirect, url_for,session
+from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario
+from flask import Flask, render_template, request, redirect, url_for, session
 from models import ConnectFirebase, Pedido, Usuario
 import folium
 import unicodedata
@@ -23,7 +23,6 @@ import unicodedata
 # Python standard libraries
 import json
 import os
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Third party libraries
 from flask import Flask, redirect, request, url_for
@@ -38,23 +37,27 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 # Configuration
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 GOOGLE_CLIENT_ID = "724763817794-ggc2ttdiijonm72qd27s1fjkk3a0sglm.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "-FLrj22Pal8oD8X2u2HLfzw3"
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
 
-app = Flask(__name__,static_url_path='/static')
+app = Flask(__name__, static_url_path='/static')
 app.secret_key = GOOGLE_CLIENT_SECRET
+
 
 @app.route('/')
 def root():
     return render_template('wb.html', datos=None)
 
+
 @app.route('/searchLista')
 def searchLista():
     restaurantes = listarRestaurantes.getListaRestaurantes()
-    return render_template('searchLista.html', datos = restaurantes)
+    return render_template('searchLista.html', datos=restaurantes)
+
 
 @app.route('/map')
 def mapaRestaurantesCercanos():
@@ -64,82 +67,111 @@ def mapaRestaurantesCercanos():
         left='20%',
         width=700,
         height=500,
-        location = [misCoord.latitude, misCoord.longitude],
-        zoom_start = 15
+        location=[misCoord.latitude, misCoord.longitude],
+        zoom_start=15
     )
-    
-    
+
     for mark in restaurantes:
         lat = float(mark.geo_location['lat'])
         lng = float(mark.geo_location['lng'])
-        lat_lng = (lat,lng)
+        lat_lng = (lat, lng)
         nombre = unicodedata.normalize('NFD', mark.name)
-        nombre = nombre.encode("utf8").decode("ascii","ignore")
+        nombre = nombre.encode("utf8").decode("ascii", "ignore")
         key = listarRestaurantes.getKeyRestaurante(nombre)
-        html = folium.Html('<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>', script=True)
+        html = folium.Html(
+            '<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>',
+            script=True)
         folium.Marker(
-            name = "hola",
+            name="hola",
             location=lat_lng,
             popup=folium.Popup(html, max_width=300, height=500),
             tooltip="Click aqui"
         ).add_to(map)
-    return render_template('map.html',map=map._repr_html_())
-@app.route('/pedidos')
-def pedidos():
-    return render_template('pedidos.html', datos=None)
+    return render_template('map.html', map=map._repr_html_())
 
+
+@app.route('/pedidos/<id_user>')
+def pedidos(id_user):
+    if session['id'] != id_user:
+        return redirect(url_for('pedidos', id_user=session['id']))
+    # Obtener el usuario a partir de la id
+    user = usuario.get_usuario(id_user)
+    user_value = list(user.values())[0]
+    # Recuperar el restaurante
+    rest = listarRestaurantes.get_restaurante_by_correo(user_value['correo'])
+    rest_key = list(rest)[0]
+    pendiente = misPedidos.getPedidosRestaurante(rest_key, "Pendiente")
+    terminado = misPedidos.getPedidosRestaurante(rest_key, "Terminado")
+    for k, v in pendiente.items():
+        cliente = AdminUsuarios.getUsuario(v['Cliente'])
+        cliente = list(cliente.values())[0]
+        v['Cliente'] = cliente['Nombre']
+    for k, v in terminado.items():
+        cliente = AdminUsuarios.getUsuario(v['Cliente'])
+        cliente = list(cliente.values())[0]
+        v['Cliente'] = cliente['Nombre']
+    return render_template('pedidos.html', datos=pendiente, datos2=terminado)
+
+
+'''
 @app.route('/pedidosPendientes')
 def pedidosPendientes():
     pedidos = misPedidos.getMisPedidos("pendiente")
     return render_template('pedidosPendientes.html', datos=pedidos)
 
+
 @app.route('/pedidosAnteriores')
 def pedidosAnteriores():
     pedidos = misPedidos.getMisPedidos("terminado")
     pedidosLista = list(pedidos)
-    if (pedidosLista.__len__() > 0):
+    if len(pedidosLista) > 0:
         return render_template('pedidosAnteriores.html', datos=pedidos)
     else:
         return render_template('pedidosAnteriores.html', datos=None)
+'''
 
 @app.route('/borrarPedido/<id_pedido>', methods=["GET", "POST"])
 def borrarPedido(id_pedido):
     misPedidos.deletePedido(id_pedido)
-    return redirect(url_for('pedidosAnteriores'))
- 
+    return redirect(url_for('pedidos'))
+
+
 @app.route('/listarMenusRestauranteWeb/<id_restaurante>', methods=["GET", "POST"])
 def listarMenusRestauranteWeb(id_restaurante):
+    restaurante = listarRestaurantes.get_restaurante(id_restaurante)
     menus = listarRestaurantes.getListaMenusRestaurante(id_restaurante)
-    if (menus.__len__() > 0):
+    tiempo = listarRestaurantes.get_weather_pollution_for_restaurante(restaurante)
+    if len(menus) > 0:
         pedido = request.get_json()
-        if (pedido is not None):
+        if pedido is not None:
             misPedidos.crearPedido(pedido, id_restaurante)
-        
-        return render_template('listaMenusRestaurante.html', datos=menus)
+
+        return render_template('listaMenusRestaurante.html', datos=menus, restaurante=restaurante, tiempo=tiempo)
     else:
-        return render_template('listaMenusRestaurante.html', datos=None)
-    
-       
+        return render_template('listaMenusRestaurante.html', datos=None, restaurante=restaurante, tiempo=tiempo)
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def show_signup_form():
-    datos= Login.get(request)
-    
-    if datos[0]=="wb.html":
+    datos = Login.get(request)
+
+    if datos[0] == "wb.html":
         return redirect(url_for('root'))
-    elif datos[0] =='next':
+    elif datos[0] == 'next':
         return redirect(next)
     else:
-        return render_template(datos[0],datos=datos[1])
-    
+        return render_template(datos[0], datos=datos[1])
+
+
 @app.route("/register", methods=["GET", "POST"])
 def show_register_form():
     datos = Registro.get(request)
-    return render_template(datos[0],datos=datos[1])
+    return render_template(datos[0], datos=datos[1])
+
 
 # SE DESESTIMA C DE USUARIOS EN FAVOR DE OAUTH
-#@app.route("/crearUsuario", methods=["GET", "POST"])
-#def crear_usuario():
+# @app.route("/crearUsuario", methods=["GET", "POST"])
+# def crear_usuario():
 #    datos = AdminUsuarios().create(request)
 #    
 #    if datos[0]=="listarUsuarios.html":
@@ -147,74 +179,159 @@ def show_register_form():
 #    else:
 #        return render_template(datos[0], datos = datos[1])
 
+
 @app.route('/listarUsuarios')
 def listarUsuarios():
     datos = AdminUsuarios.getListaUsuarios()
-    return render_template('admin/listarUsuarios.html', datos = datos)
-    
+    return render_template('admin/listarUsuarios.html', datos=datos)
+
+
 @app.route('/editarUsuario/<id_usuario>', methods=["GET", "POST"])
 def editarUsuario(id_usuario):
     usuario = AdminUsuarios.getUsuario(id_usuario)
-    datos = AdminUsuarios.update(request,id_usuario)
-    
+    datos = AdminUsuarios.update(request, id_usuario)
+
     if datos is not None:
         return redirect(url_for('listarUsuarios'))
-    
-    return render_template('admin/editarUsuario.html', datos = usuario)
 
-    
+    return render_template('admin/editarUsuario.html', datos=usuario)
+
+
+@app.route('/editarUsuarioR/<id_user>', methods=["GET", "POST"])
+def editarUsuarioUser(id_user):
+    if session['id'] != id_user:
+        return redirect(url_for('editarUsuarioUser', id_user=session['id']))
+    # Obtener el usuario a partir de la id
+    user = usuario.get_usuario(id_user)
+    user_key = list(user)[0]
+    user_value = list(user.values())[0]
+    # Establecer datos para POST
+    datos = AdminUsuarios.update(request, user_key)
+
+    if datos is not None:
+        return redirect(url_for('index'))
+
+    return render_template('admin/editarUsuario.html', datos=user)
+
+
 @app.route('/borrarUsuario/<id_usuario>', methods=["GET", "POST"])
 def borrarUsuario(id_usuario):
     AdminUsuarios.delete(id_usuario)
     return redirect(url_for('listarUsuarios'))
 
-    
+
 @app.route('/admin')
 def admin():
-    return render_template('admin/main.html', busqueda = None)
+    return render_template('admin/main.html', busqueda=None)
+
 
 @app.route('/logout')
 def logout():
-
-    session.pop('user_id',None)
-    session.pop('rol',None)
+    session.pop('user_id', None)
+    session.pop('rol', None)
     session.clear()
-    
+
     return redirect(url_for('root'))
+
 
 @app.route('/listarMenu')
 def listarMenu():
     menus = AdminMenus.getLista()
-    return render_template('admin/listarMenus.html', datos = menus)
+    return render_template('admin/listarMenus.html', datos=menus)
 
-@app.route('/listarMenusRestaurante')
-def listarMenusRestaurante():
-    menus = AdminMenus.getLista()
-    return render_template('admin/listarMenus.html', datos = menus)
 
-@app.route('/crearMenu',methods=["GET", "POST"])
+@app.route('/listarMenusRestaurante/<id_user>')
+def listarMenusRestaurante(id_user):
+    if session['id'] != id_user:
+        return redirect(url_for('listarMenusRestaurante', id_user=session['id']))
+    # Obtener el usuario a partir de la id
+    user = usuario.get_usuario(id_user)
+    user_value = list(user.values())[0]
+    rest = listarRestaurantes.get_restaurante_by_correo(user_value['correo'])
+    rest_key = list(rest)[0]
+    menus = listarRestaurantes.getListaMenusRestaurante(rest_key)
+    session['id_restaurante'] = rest_key
+    return render_template('admin/listarMenus.html', datos=menus)
+
+
+@app.route('/listarRestaurantes')
+def listarRestaurantesWeb():
+    rests = AdminRestaurantes.getLista()
+    return render_template('admin/listarRestaurantes.html', datos=rests)
+
+
+@app.route('/crearMenu', methods=["GET", "POST"])
 def crearMenu():
     datos = AdminMenus().create(request)
-    listaRes = listarRestaurantes.getListaRestaurantes()
-    if datos[0]=="listarMenu.html":
+    listaRes = AdminRestaurantes.getLista()
+    if datos[0] == "listarMenu.html":
         return redirect(url_for('listarMenu'))
+    elif datos[0] == "listarMenusRestaurante.html":
+        return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
     else:
-        return render_template(datos[0], datos = datos[1], datos2=listaRes)
+        return render_template(datos[0], datos=datos[1], datos2=listaRes)
+
 
 @app.route('/editarMenu/<id_menu>', methods=["GET", "POST"])
 def editarMenu(id_menu):
     menus = AdminMenus.get(id_menu)
-    datos = AdminMenus.update(request,id_menu)
-    listaRes = listarRestaurantes.getListaRestaurantes()
+    datos = AdminMenus.update(request, id_menu)
+    listaRes = AdminRestaurantes.getLista()
     if datos is not None:
+        if session['rol'] == 'restaurante':
+            return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
         return redirect(url_for('listarMenu'))
-    
-    return render_template('admin/editarMenu.html', datos = menus, datos2=listaRes)
+
+    return render_template('admin/editarMenu.html', datos=menus, datos2=listaRes)
+
 
 @app.route('/borrarMenu/<id_menu>', methods=["GET", "POST"])
 def borrarMenu(id_menu):
     AdminMenus.delete(id_menu)
-    return redirect(url_for('listarMenu'))
+    if session['rol'] == 'restaurante':
+        return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
+    return redirect(url_for('listarMenus'))
+
+
+@app.route('/editarRestaurante/<id_restaurante>', methods=["GET", "POST"])
+def editarRestaurante(id_restaurante):
+    rest = AdminRestaurantes.get(id_restaurante)
+    datos = AdminRestaurantes.update(request, id_restaurante)
+
+    if datos is not None:
+        return redirect(url_for('listarRestaurantesWeb'))
+
+    return render_template('admin/editarRestaurante.html', datos=rest)
+
+
+# Hacer lo mismo pero para la lista de Menus, para la modificación del usuario y para
+# lista de pedidos.
+@app.route('/editarRestauranteR/<id_user>', methods=["GET", "POST"])
+def editarRestauranteUser(id_user):
+    if session['id'] != id_user:
+        return redirect(url_for('editarRestauranteUser', id_user=session['id']))
+    # Obtener el usuario a partir de la id
+    user = usuario.get_usuario(id_user)
+    user_key = list(user)[0]
+    user_value = list(user.values())[0]
+    # Recuperar el restaurante
+    rest = listarRestaurantes.get_restaurante_by_correo(user_value['correo'])
+    rest_key = list(rest)[0]
+    rest_value = list(rest.values())[0]
+    # Establecer datos para POST
+    datos = AdminRestaurantes.update(request, rest_key)
+
+    if datos is not None:
+        return redirect(url_for('index'))
+
+    return render_template('admin/editarRestaurante.html', datos=rest_value)
+
+
+@app.route('/borrarRestaurante/<id_restaurante>', methods=["GET", "POST"])
+def borrarRestaurante(id_restaurante):
+    AdminRestaurantes.delete(id_restaurante)
+    return redirect(url_for('listarRestaurantes'))
+
 
 @app.route('/loginGoogle', methods=["GET", "POST"])
 def loginGoogle():
@@ -235,6 +352,7 @@ login_manager.init_app(app)
 def unauthorized():
     return "You must be logged in to access this content.", 403
 
+
 # OAuth2 client setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
@@ -243,6 +361,7 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 @login_manager.user_loader
 def load_user(user_id):
     return Usuario.get(user_id)
+
 
 @app.route("/login")
 def login():
@@ -258,6 +377,7 @@ def login():
         scope=["openid", "email", "profile"],
     )
     return redirect(request_uri)
+
 
 @app.route("/login/callback")
 def callback():
@@ -308,46 +428,49 @@ def callback():
     # by Google
     firebase = ConnectFirebase().firebase
     db = firebase.database()
-        
+
     user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(users_email).get().val()
-    
+
     session['nombre'] = users_name
     session['id'] = unique_id
     session['correo'] = users_email
-     
-       
+
     if user_by_id == []:
         print("usuario no existe")
-        datosGoogle = {"id": unique_id ,"nombre" : users_name, "correo":users_email}
+        datosGoogle = {"id": unique_id, "nombre": users_name, "correo": users_email}
         session['nombre'] = users_name
         session['id'] = unique_id
         session['correo'] = users_email
         return redirect(url_for("show_register_form"))
-    
+
     clave = list(user_by_id)[0]
     session['rol'] = user_by_id[clave]['rol']
     session['user'] = users_email
     user = Usuario(
-        id_=unique_id, name=users_name, email=users_email, rol = user_by_id[clave]['rol']
+        id_=unique_id, name=users_name, email=users_email, rol=user_by_id[clave]['rol']
     )
-    
+
     login_user(user)
-    
+
     # Send user back to homepage
     return redirect(url_for("root"))
+
 
 @app.route("/salir")
 @login_required
 def salir():
     logout_user()
-    session.pop('user',None)
-    session.pop('rol',None)
-    session.pop('id',None)
-    session.pop('correo',None)
+    session.pop('user', None)
+    session.pop('rol', None)
+    session.pop('id', None)
+    session.pop('correo', None)
     session.clear()
     return redirect(url_for("root"))
+
+
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
+
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

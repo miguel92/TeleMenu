@@ -49,29 +49,42 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li>
-                    <a style="color:white" href="/"> <img src="{{ url_for('static', filename='icons/favicon.png') }}" style="margin-right:6px">TeleMenú</a>
+                    <a style="color:white" href="/"> <img src="{{ url_for('static', filename='icons/favicon.png') }}"
+                                                          style="margin-right:6px">TeleMenú</a>
 
                 </li>
                 <li>
-                	<a style="color:white" href="/searchLista"> <span class="glyphicon glyphicon-search icono_enlace" aria-hidden="true"></span>Buscar Restaurantes</a>
+                    <a style="color:white" href="/searchLista"> <span class="glyphicon glyphicon-search icono_enlace"
+                                                                      aria-hidden="true"></span>Buscar Restaurantes</a>
                 </li>
                 {% if session['user'] %}
-                {% if session['rol'] == 'restaurante' %}
-	                <li>
-	                   <a href="/pedidos"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
-	                </li>
-	              	<li>
-	                   <a href="/listarMenusRestaurante"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Men&uacute;s</a>
-	                </li>
-                 {% endif %}
+                    {% if session['rol'] == 'restaurante' %}
+                        <li>
+                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <span
+                                    class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Tu usuario</a>
+                        </li>
+                        <li>
+                            <a href="/editarRestauranteR/{{ session['user_id'] }}"> <span
+                                    class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Tu restaurante</a>
+                        </li>
+                        <li>
+                            <a href="/listarMenusRestaurante/{{ session['user_id'] }}"> <span
+                                    class="fas fa-clipboard-list icono_enlace" aria-hidden="true"></span>
+                                Men&uacute;s</a>
+                        </li>
+                        <li>
+                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
+                                                                               aria-hidden="true"></span> Pedidos</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
-            	{% block menu %}
-  	
-                {% if session['user'] %}
-                <li>
+                {% block menu %}
+
+                    {% if session['user'] %}
+                        <li>
                    <a href="/salir"> <span class="glyphicon glyphicon-log-out icono_enlace" aria-hidden="true"></span> Logout</a>
                 </li>          
                                 <!-- Solo visible para administradores del sitio -->
@@ -79,6 +92,7 @@
                 <li>
                    <a href="/admin"> <span class="glyphicon glyphicon-wrench icono_enlace" aria-hidden="true"></span> Administrar</a>
                 </li>
+
                 {% endif %}
                 {% else %}
                 <li>
