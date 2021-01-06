@@ -1,91 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
+    <h1><strong>{{ restaurante['Nombre'] }}</strong></h1>
 
-{% if datos == None %}
-<style>
-.error {
-    width:200px;
-    height:20px;
-    height:auto;
-    position:absolute;
-    left:50%;
-    margin-left:-100px;
-    bottom:10px;
-    background-color: #383838;
-    color: #F0F0F0;
-    font-family: Calibri;
-    font-size: 20px;
-    padding:10px;
-    text-align:center;
-    border-radius: 2px;
-    -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
-    -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
-    box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
-}
-</style>
-<h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
-{% else %}
-<div class="row">
-	<div class="col-sm-6">
-		<h3>Menus disponibles</h3>
-		{% for key, value in datos.items() %}
-		<div class="row">
-				<ul class="list-group">
-					<a href="#1" class="list-group-item">
-						<h4>{{value['Nombre']}}</h4>
-						<p>{{value['Ingredientes']}}</p>
-						<p>Precio: {{value['Precio']}} Eur. </p>
-						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}', '{{value['Precio']}}')" /> </p>
-					</a>
-				</ul>
-		</div>
-		{%endfor%}
-		<div class='error' style='display:none; width:200px;height:20px;height:auto;position:absolute;background-color: #383838;left:100%;margin-left:-100px;color: #F0F0F0;top:10px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Men&uacute; a&ntilde;adido a la cesta.</div>
-	  </div>
-	  
-		<script>
-		function showNotification() {
+    <h2>{{ restaurante['description'] }}</h2>
 
-		}
-		pedido = {}
-		function agregarPedido(nombre, precio){	
-			pedido['Nombre']=nombre;
-			pedido['Precio']=precio;
-			
-			pedido['Restaurante']='{{id_restaurante}}'
-			id_restaurante = '{{id_restaurante}}'
-			
-			$('.error').fadeIn(400).delay(3000).fadeOut(400); //fade out after 3 seconds
-			$.ajax({
-		          type: "POST",
-		          url: "../listarMenusRestauranteWeb/" + id_restaurante,
-		          contentType: "application/json;charset=utf-8",
-		          data: JSON.stringify({pedido}),
-		          dataType: "json",
-		          success: function(data, textStatus){
-		        	  console.log("sdsad");
-		        	  if (data.redirect){
-		        		  
-		        		  window.location.href = data.redirect;
-		        	  }
-		          }
-		          });
-			
-		}
-		
-		
-		function rederigir(){
-			if (hayPedido){
-				console.log(hayPedido);
-				location.href = '/pedidoRealizado';					
-			}
-		}
-	
-		</script>
-		
-</div>
+    <div class="row">
+        <div class="col-sm-4">
+            <h4>Dirección</h4>
+            <p>{{ restaurante['direccion'] }}</p>
+            {% if tiempo != None %}
+                <h4>Tiempo</h4>
+                <p>{{ tiempo['weather']['descripcion'] }}</p>
+                <p>Temperatura: {{ tiempo['weather']['temperature'] }}ºC</p>
+                <p>Humedad: {{ tiempo['weather']['humidity'] }}%</p>
+                <p/>
+                <h4>Polución</h4>
+                <p>Calidad del aire: {{ tiempo['pollution']['air_quality'] }}</p>
+            {% endif %}
+        </div>
+        {% if datos == None %}
+            <div class="col-sm-6">
+                <h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
+            </div>
+        {% else %}
+            <div class="col-sm-4">
+                <h3>Menus disponibles</h3>
+                {% for key, value in datos.items() %}
+                    <div class="row">
+                        <ul class="list-group">
+                            <a href="#1" class="list-group-item">
+                                <div>
+                                    <h4>{{ value['Nombre'] }}</h4>
+                                    {% set src = url_for('static', filename='') + value["Foto"] %}
+                                    <img class="centrar_imagen" src="{{ src }}">
+                                </div>
 
-{% endif %}
+                                <p><i>{{ value['Ingredientes'] }}</i></p>
+                                <p><strong>Precio:</strong> {{ value['Precio'] }} Eur.</p>
 
-	
+                                <p align="right"><input type="button" value="A&ntilde;adir al pedido"
+                                                        class="btn btn-success"
+                                                        onclick="agregarPedido('{{value['Nombre']}}', '{{value['Precio']}}')"/></p>
+                            </a>
+                        </ul>
+                    </div>
+                {% endfor %}
+             	<div class='error' style='display:none; width:200px;height:20px;height:auto;position:absolute;background-color: #383838;left:100%;margin-left:-100px;color: #F0F0F0;top:10px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Men&uacute; a&ntilde;adido a la cesta.</div>
+            </div>
+        {% endif %}
+    </div>
+
 {% endblock %}
+
+{% block javascript %}
+pedido = {}
+function agregarPedido(nombre, precio){	
+	pedido['Nombre']=nombre;
+	pedido['Precio']=precio;
+	
+	pedido['Restaurante']='{{id_restaurante}}'
+	id_restaurante = '{{id_restaurante}}'
+	
+	$('.error').fadeIn(400).delay(3000).fadeOut(400); //fade out after 3 seconds
+	$.ajax({
+          type: "POST",
+          url: "../listarMenusRestauranteWeb/" + id_restaurante,
+          contentType: "application/json;charset=utf-8",
+          data: JSON.stringify({pedido}),
+          dataType: "json",
+          success: function(data, textStatus){
+        	  console.log("sdsad");
+        	  if (data.redirect){
+        		  
+        		  window.location.href = data.redirect;
+        	  }
+          }
+          });
+	
+}
+{% endblock javascript %}

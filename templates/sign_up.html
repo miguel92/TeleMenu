@@ -36,18 +36,10 @@
 <br/>
 <br/>
 
+{% endblock content %}
 
-
-        <script type="text/javascript">
-            window.onload = function() {
-                if(!window.location.hash) {
-                    window.location = window.location + '#loaded';
-                    window.location.reload();
-                }
-            }
-            {% if datos%}
+{% block javascript%}
+	        {% if datos%}
               alert("Contraseña equivocada");
             {% endif %}
-        </script>
-
-{% endblock content %}
+{% endblock javascript%}

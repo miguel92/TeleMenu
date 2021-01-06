@@ -1,17 +1,45 @@
 {% extends "admin/main.html" %}
 {% block body %}
-
-	<h3>Actualizaci&oacute;n de usuarios</h3>
-	<div class="row">
-    <div class="col-md-12">
-        <form class="form-horizontal" role="form" action="" method="post">
-        	{%for key,value in datos.items()%}
-            <div class="form-group">
-                <label for="inputNombreMenu" class="col-sm-3 control-label">Nombre</label>
+    <div class="col-lg-12 text-center">
+    {% if session['rol'] == 'restaurante' %}
+        <h1>Mi Usuario</h1>
+    {% endif %}
+    {% if session['error'] %}
+        <div class="alert alert-danger">{{ session['error'] }}</div>
+    {% endif %}
+    <h3>Actualizaci&oacute;n de usuario</h3>
+    <p/>
+	
+    <div class="row">
+        <div class="col-md-12">
+        {% if session['rol'] == 'restaurante' %}
+        <ul class="nav nav-tabs" style="margin-bottom:20px;">
+		  <li class="active"><a href="/editarUsuarioR/{{ session['user_id'] }}">Datos Usuario</a></li>
+		  <li><a href="/editarRestauranteR/{{ session['user_id'] }}">Datos Restaurante</a></li>
+		</ul>
+		{% endif %}
+            <form class="form-horizontal" role="form" action="" method="post">
+                {% for key,value in datos.items() %}
+                    <div class="form-group">
+                        <label for="inputNombreMenu" class="col-sm-3 control-label">Nombre</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Nombre"
+                                   value="{{ value['Nombre'] }}">
+                        </div>
+            </div>
+               <div class="form-group">
+                <label for="inputNombreMenu" class="col-sm-3 control-label">Direcci&oacute;n</label>
                 <div class="col-sm-6">
-                    <input type="text" class="form-control" name="inputNombreMenu" id="inputNombreMenu" placeholder="Nombre" value="{{ value['Nombre'] }}">
+                    <input type="text" class="form-control" name="direccion" id="direccion" placeholder="Direcci&oacute;n" value="{{ value['direccion'] }}">
                 </div>
             </div>
+               <div class="form-group">
+                <label for="inputNombreMenu" class="col-sm-3 control-label">Tel&eacute;fono</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="telefono" id="telefono" placeholder=Tel&eacute;fono value="{{ value['telefono'] }}">
+                </div>
+            </div>
+       
             <div class="form-group text-center">
                 <button type="submit" value="submit" class="btn btn-warning">Actualizar</button>
                 <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->

@@ -1,63 +1,123 @@
 {% extends "base.html" %}
 {% block content %}
+    <div class="col-lg-12 text-center">
+        {% if session['rol'] == 'restaurante' %}
+            <h1>Pedidos del Restaurante</h1>
+        {% endif %}
+        {% if session['error'] %}
+            <div class="alert alert-danger">{{ session['error'] }}</div>
+        {% endif %}
+        <br/>
+        <!--
+        <a class="btn btn-primary" href="/new">
+            Crear anuncio
+            <span style="margin-left: 5px;" class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+        </a>
+        -->
+        <div class="btn-group">
+            <a id="pendiente" class="btn btn-primary">Pedidos Pendientes</a>
+            <a id="realizado" class="btn btn-default">Pedidos Realizados</a>
+        </div>
 
-<div class="row">
-    <div class="col-lg-12 text-left">
-        <h1>Mis pedidos</h1>
+        <div id="pendiente_lista" class="row" style="display: block;">
+            <h3>Pedidos pendientes de entrega</h3>
+            {% if datos %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for key, value in datos.items() %}
+                        <tr>
+                            <td>{{ value['Pedido'] }}</td>
+                            <td>
+                                <a href="/pedidoRealizado/{{ key }}"><i class="fas fa-check"></i></a>
+                                <a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h5>No tienes pedidos pendientes</h5>
+            {% endif %}
+        </div>
+        <div id="terminado_lista" class="row" style="display: none;">
+            <h3>Pedidos terminados</h3>
+            {% if datos2 %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Persona</th>
+                        <th class="text-center">Direcci&oacute;n</th>
+                        <th class="text-center">Pedido</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for key, value in datos2.items() %}
+                        <tr>
+                            <td>
+                                {{ value['Cliente'] }}
+                            </td>
+                            <td>
+                                {{ value['Direccion'] }}
+                            </td>
+                            <td>
+                                {% for k,v in value['Pedido'].items() %}
+                                    {% if k != 'Restaurante' %}
+                                        {{ k }}: {{ v }}
+                                        <br/>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </td>
+                            <td>
+                                <a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h5>No tienes pedidos terminados</h5>
+            {% endif %}
+        </div>
+    </div>
 
     </div>
-</div>
-<br/>
-<!--  
-<a class="btn btn-primary" href="/new">
-    Crear anuncio
-    <span style="margin-left: 5px;" class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-</a>
--->
-<br/>
-<br/>
-<div class="row">
-	<div class="col-lg-3" style="margin-top:20px">
-		  <div class="panel-group">
-		    <div class="panel panel-default">
-		      <div class="panel-heading">
-		        <h4 class="panel-title">
-		          <a data-toggle="collapse" href="#collapse1" class="enlace_collapse"><strong><i class="fas fa-utensils"></i> Pedidos pendientes</strong></a>
-		        </h4>
-		      </div>
-		      <div id="collapse1" class="panel-collapse collapse">
-		        <div class="panel-body"><a href="/pedidosPendientes"><i class="fas fa-list"></i> Mostrar</a></div>
-		      </div>
-		    </div>
-		  </div>
-		  <div class="panel-group">
-		    <div class="panel panel-default">
-		      <div class="panel-heading">
-		        <h4 class="panel-title">
-		          <a data-toggle="collapse" href="#collapse2" class="enlace_collapse"><strong><i class="fas fa-utensils"></i> Pedidos anteriores</strong></a>
-		        </h4>
-		      </div>
-		      <div id="collapse2" class="panel-collapse collapse">
-		        <div class="panel-body"><a href="/pedidosAnteriores"><i class="fas fa-list"></i> Mostrar</a></div>
-		      </div>
-		    </div>
-		  </div>
-	</div>
-	<div class="col-lg-9">
-	{% block body %}{% endblock %}
-	</div>
-</div>
 
 
 
 
-        <script type="text/javascript">
-            window.onload = function() {
-                if(!window.location.hash) {
-                    window.location = window.location + '#loaded';
-                    window.location.reload();
+    <script type="text/javascript">
+        window.onload = function () {
+            $(document).ready(function () {
+                var realizado = document.getElementById('realizado');
+                var pendiente = document.getElementById('pendiente');
+                var realizado_lista = document.getElementById('terminado_lista');
+                var pendiente_lista = document.getElementById('pendiente_lista');
+                realizado.onclick = function () {
+                    realizado.className = "btn btn-primary";
+                    pendiente.className = "btn btn-default";
+                    realizado_lista.style = "display: block;"
+                    pendiente_lista.style = "display: none;"
                 }
-            }
-        </script>
+                pendiente.onclick = function () {
+                    realizado.className = "btn btn-default";
+                    pendiente.className = "btn btn-primary";
+                    pendiente_lista.style = "display: block;"
+                    realizado_lista.style = "display: none;"
+
+                }
+            });
+        }
+    </script>
 
 {% endblock content %}

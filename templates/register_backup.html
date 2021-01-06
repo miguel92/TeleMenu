@@ -6,19 +6,34 @@
 	    <div class="col-md-8 text-center">
 				
 	          <form action="" method="post" enctype="multipart/form-data">
-				  <h1 class="">&iexcl;Vaya es la primera vez que entras&excl;</h1>
-				  <h3 class="w-100 font-weight-bold" style="color:grey;">Necesitamos datos adicionales para tu cuenta</h3>	           
+	
+	              <h4 class="w-100 font-weight-bold">Registro de usuario</h4>
+	              
 	              <div>
 	               <label data-error="wrong" data-success="right" for="tipoUsuario">Selecciona tu tipo de cuenta</label>
 					  <div class="radio">	 
 						  <label class="radio-inline"><input type="radio" id="tipo_1" name="tipoUsuario" value="cliente" checked>Cliente</label>
-						  <p style="font-style:italic">Si lo que quieres es pedir comida a domicilio, &iexcl;esta es la opci&oacute;n que tienes que elegir&excl;</p>
+						  <label class="radio-inline"><input type="radio" id="tipo_2" name="tipoUsuario" value="restaurante">Restaurante</label>
 					  </div>
-					  <div class="radio">
-					  <label class="radio-inline"><input type="radio" id="tipo_2" name="tipoUsuario" value="restaurante">Restaurante</label>
-					  <p style="font-style:italic">Si lo que buscas es poder servir los men&uacute;s de tu restaurante, administrar los pedidos y valoraciones , &iexcl;esta es la opci&oacute;n que tienes que elegir&excl;</p>
-					  </div>
-				  </div>              
+				  </div>
+				  <div>
+	                <label data-error="wrong" data-success="right" for="nombre">Nombre Usuario</label>
+	                <input type="text" name="nombre" id="nombre" class="form-control validate">
+	              </div>
+				  <div>
+	                <label data-error="wrong" data-success="right" for="correo">Correo electr&oacute;nico</label>
+	                <input type="email" name="correo" id="correo" class="form-control validate">
+	              </div>
+	              <div>
+	                <label data-error="wrong" data-success="right" for="pass1">Contrase&ntilde;a</label>
+	                <input type="password" name="pass1" id="pass1" class="form-control validate">
+	              </div>
+	              
+	              <div>
+	                <label data-error="wrong" data-success="right" for="pass2">Repite Contrase&ntilde;a</label>
+	                <input type="password" name="pass2" id="pass2" class="form-control validate">
+	              </div>
+	              
 	              <div>
 	                <label data-error="wrong" data-success="right" for="direccion">Direcci&oacute;n</label>
 	                <input type="text" name="direccion" id="direccion" class="form-control validate">
@@ -45,9 +60,7 @@
 					  </div>
 	              </div>
 
-				<input type="hidden" name="nombre" id="nombre" value="{{session['nombre']}}">
-				<input type="hidden" name="correo" id="correo" value="{{session['correo']}}">
-				<input type="hidden" name="id" id="id" value="{{session['id']}}">
+	
 	            <div class="d-flex justify-content-center" style="margin-top:20px">
 	              <input type="submit" value="Registrarse" class="btn btn-success">
 	            </div>

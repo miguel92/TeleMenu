@@ -1,15 +1,15 @@
 {% extends "admin/main.html" %}
 {% block body %}
     {% if datos is not none %}
-        <h3>Tabla de Usuarios</h3>
+        <h3>Tabla de Restaurantes</h3>
         <table class="table">
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Correo elect.</th>
+                <th>Correo electronico asociado</th>
+                <th>Descripci&oacute;n</th>
                 <th>Direcci&oacute;n</th>
                 <th>Tel&eacute;fono</th>
-                <th>Rol en la APP</th>
 
                 <th>Acciones</th>
             </tr>
@@ -19,16 +19,16 @@
                 <tr>
                     <td>{{ value['Nombre'] }}</td>
                     <td>{{ value['correo'] }}</td>
+                    <td>{{ value['descripcion'] }}</td>
                     <td>{{ value['direccion'] }}</td>
                     <td>{{ value['telefono'] }}</td>
-                    <td>{{ value['rol'] }}</td>
                     <td>
 
 
-                        <a href="/editarUsuario/{{ key }}"><i class="fas fa-edit"></i></a>
+                        <a href="/editarRestaurante/{{ key }}"><i class="fas fa-edit"></i></a>
                         {% if value['rol'] != "administrador" %}
 
-                            <a href="/borrarUsuario/{{ key }}"><i class="fas fa-trash"></i></a>
+                            <a href="/borrarRestaurante/{{ key }}"><i class="fas fa-trash"></i></a>
                         {% endif %}
                     </td>
 
@@ -39,8 +39,9 @@
             </tbody>
         </table>
     {% else %}
-        <h3>No hay Usuarios creados</h3>
+        <h3>No hay restaurantes creados</h3>
     {% endif %}
+
 
 
 {% endblock %}

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <meta name="google-signin-client_id" content="724763817794-ggc2ttdiijonm72qd27s1fjkk3a0sglm.apps.googleusercontent.com">
     <title>TeleMenú</title>
 
 
@@ -49,20 +49,37 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li>
-                    <a style="color:white" href="/"> <img src="{{ url_for('static', filename='icons/favicon.png') }}" style="margin-right:6px">TeleMenú</a>
+                    <a style="color:white" href="/"> <img src="{{ url_for('static', filename='icons/favicon.png') }}"
+                                                          style="margin-right:6px">TeleMenú</a>
 
                 </li>
                 <li>
-                	<a style="color:white" href="/searchLista"> <span class="glyphicon glyphicon-search icono_enlace" aria-hidden="true"></span>Buscar Restaurantes</a>
+                    <a style="color:white" href="/searchLista"> <i class="fas fa-search icono_enlace"></i>Buscar Restaurantes</a>
                 </li>
                 {% if session['user'] %}
                 {% if session['rol'] == 'restaurante' %}
-                <ul>
-	                <li>
-	                   <a href="/pedidosRestaurante"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Pedidos</a>
-	                   <a href="/listarMenusRestaurante"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Men&uacute;s</a>
-	                </li>
-                 {% endif %}
+                        <li>
+                            <a href="/listarMenusRestaurante/{{ session['user_id'] }}"> 
+                            	<span class="fas fa-clipboard-list icono_enlace" aria-hidden="true"></span>
+              					Men&uacute;s
+              				</a>
+                        </li>
+                        <li>
+                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
+                                                                               aria-hidden="true"></span> Pedidos</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% if session['rol'] == 'cliente' %}
+                        <li>
+                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <span
+                                    class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Tu usuario</a>
+                        </li>
+                        <li>
+                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
+                                                                               aria-hidden="true"></span> Pedidos</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
                 
                 {% if session['user'] %}
@@ -78,29 +95,30 @@
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
-            	{% block menu %}
-  	
-                {% if session['user'] %}
-                <li>
-                   <a href="/logout"> <span class="glyphicon glyphicon-log-out icono_enlace" aria-hidden="true"></span> Logout</a>
+                {% block menu %}
+
+                    {% if session['user'] %}
+                  		<li>
+                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <i class="fas fa-user-cog icono_enlace"></i>Ajustes</a>
+                        </li>
+                        <li>
+                   <a href="/salir"> <i class="fas fa-sign-out-alt icono_enlace"></i> Logout</a>
                 </li>          
                                 <!-- Solo visible para administradores del sitio -->
                 {% if session['rol'] == 'administrador' %}
                 <li>
                    <a href="/admin"> <span class="glyphicon glyphicon-wrench icono_enlace" aria-hidden="true"></span> Administrar</a>
                 </li>
+
                 {% endif %}
                 {% else %}
                 <li>
                 <!--   <a data-toggle="modal" data-target="#modalLoginForm" href=""> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a> -->
-                 <a href="/signup"> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a>
-                </li>
-                <li>
-                   <a href="/register"> <span class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Registrarse</a>
+                 <a href="/login"> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a>
+                 
                 </li>
                 {% endif %}
                 {% endblock %}
-
                 
 
             </ul>
@@ -123,14 +141,24 @@
 
 <!-- jQuery Version 1.11.1 -->
 <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 <!-- Bootstrap Core JavaScript -->
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript">
-    $('.carousel').carousel();
-    $("#tipoPlato").val($('#tipoPlatoValue').val());
-    $("#idRestaurante").val($('#idRestauranteValue').val());
+
+	$(document).ready(function(){
+		if(!window.location.hash) {
+		    window.location = window.location + '#loaded';
+		    window.location.reload();
+		}
+		{% block javascript%}
+	    
+	    {% endblock javascript%}
+	});
+
 </script>
+
+
 
 </body>
 

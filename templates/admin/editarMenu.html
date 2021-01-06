@@ -50,31 +50,34 @@
 				  <label class="col-sm-3 control-label" for="idRestaurante">Restaurante</label>
 				  <div class="col-sm-6">
 					  <select class="form-control" id="idRestaurante" name="idRestaurante">
-			            {% for key, value in datos2.items() %}
-								    <option value="{{key}}">{{value['Nombre']}}</option>
-			            {% endfor %}
-            		  </select>
-				  </div>
-			</div>
-			{% endif%}
-			<input id="idRestauranteValue" type="hidden" value="{{ value['Restaurante'] }}" name="idRestauranteValue">
-            <div class="custom-file">
-	              		<label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
-					    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
-					    <div class="invalid-feedback">Example invalid custom file feedback</div>
-			</div>
-			
-            <div class="form-group text-center">
-                <button type="submit" value="submit" class="btn btn-warning">Actualizar</button>
-                <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
+                          {% for key, value in datos2.items() %}
+                              <option value="{{ key }}">{{ value['Nombre'] }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
             </div>
-            {%endfor%}
+            {% endif %}
+                <input id="idRestauranteValue" type="hidden" value="{{ value['Restaurante'] }}"
+                       name="idRestauranteValue">
+                <div class="custom-file">
+                    {% set src = url_for('static', filename='') + value["Foto"] %}
+                    <img class="centrar_imagen" src="{{ '../'+src }}">
+                    <label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
+                    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante">
+                    <div class="invalid-feedback">Example invalid custom file feedback</div>
+                </div>
+
+                <div class="form-group text-center">
+                    <button type="submit" value="submit" class="btn btn-warning">Actualizar</button>
+                    <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
+                </div>
+            {% endfor %}
         </form>
     </div>
 </div>
-<script type="text/javascript">
-	window.onload = function() {
-		alert("hola");
-	};
-</script>
 {% endblock %}
+
+{% block javascript%}
+	$("#tipoPlato").val($('#tipoPlatoValue').val());
+    $("#idRestaurante").val($('#idRestauranteValue').val());
+{% endblock javascript%}

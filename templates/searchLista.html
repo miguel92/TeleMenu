@@ -1,99 +1,98 @@
 {% extends "base.html" %}
 {% block content %}
 
-<style>
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-  width: 13.8%;
-}
+    <style>
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+            width: 13.8%;
+        }
 
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
 
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
 
-.topnav a.active {
-  background-color: #b23939;
-  color: white;
-}
-</style>
- <div class="topnav">
-  <a class="active" href="/searchLista">Listado</a>
-  <a href="/map">Mapa</a>
-</div> 
-
-<div class="row">
-    <div class="col-lg-12 text-center">
-        <h1> &iexcl; Busca restaurantes cercanos &excl;</h1>
-
+        .topnav a.active {
+            background-color: #b23939;
+            color: white;
+        }
+    </style>
+    <div class="topnav">
+        <a class="active" href="/searchLista">Listado</a>
+        <a href="/map">Mapa</a>
     </div>
-</div>
-<br/>
-<div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <form class="form-horizontal" role="form" action="" method="post">
-			<div class="row">
-			  <div class="col-lg-12">
-			    <div class="input-group">
-			      <input type="text" class="form-control" id="inputSearch" placeholder="Tipo de cocina, C&oacute;digo postal, Platos ...">
-			      <span class="input-group-btn">
+
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <h1> &iexcl; Busca restaurantes cercanos &excl;</h1>
+
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <form class="form-horizontal" role="form" action="" method="post">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="inputSearch"
+                                   placeholder="Tipo de cocina, C&oacute;digo postal, Platos ...">
+                            <span class="input-group-btn">
 			        <button class="btn btn-default" type="button">Buscar</button>
 			      </span>
-			    </div><!-- /input-group -->
-			  </div><!-- /.col-lg-6 -->
-			</div>
-        </form>
+                        </div><!-- /input-group -->
+                    </div><!-- /.col-lg-6 -->
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2"></div>
     </div>
-    <div class="col-md-2"></div>
-</div>
-<hr color="purple" style="margin-bottom:30px">
+    <hr color="purple" style="margin-bottom:30px">
 
-{% for key, value in datos.items() %}
-<div class="row" style="margin-bottom:30px">
-	<div class="col-md-2"></div>
-    <div class="col-md-8">
-    <div class="row">
-    	<div class="col-md-12">
-    		<img src="static/img/padthai.jpg" width="150px" height="130px" style="float:left; margin-right:30px"></img>
-    	
-    	
-    	<h3>{{value['Nombre']}}</h3>
-    	<p></p>
-    	<td>{{value['Descripcion']}}</td>
-    	
-		
-    	<a href="/listarMenusRestauranteWeb/{{ key }}" class="btn btn-success" style="float:right"><i class="fas fa-utensils"></i> Ver Menus</a>
-    	</div>
-    </div>
-    	
-    </div>
-    <div class="col-md-2"></div>
-</div>
-{%endfor%}
+    {% for key, value in datos.items() %}
+        <div class="row" style="margin-bottom:30px">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="static/img/padthai.jpg" width="150px" height="130px"
+                             style="float:left; margin-right:30px"></img>
+
+                        <table style="border:hidden">
+                            <tr>
+                                <td colspan="2">
+                                    <h3>{{ value['Nombre'] }}</h3>
+                                    <p></p>
+                                    {{ value['descripcion'] }}
+                                </td>
+                                <a href="/listarMenusRestauranteWeb/{{ key }}" class="btn btn-success"
+                                   style="float:right"><i class="fas fa-utensils"></i> Ver Menus</a>
+
+                            </tr>
+                        </table>
 
 
-<br/>
-<br/>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    {% endfor %}
 
 
+    <br/>
+    <br/>
 
-        <script type="text/javascript">
-            window.onload = function() {
-                if(!window.location.hash) {
-                    window.location = window.location + '#loaded';
-                    window.location.reload();
-                }
-            }
-        </script>
 {% endblock content %}

@@ -50,3 +50,10 @@
   background-color: #4CAF50;
   color: white;
 }
+
+.centrar_imagen{
+	margin: 18px auto;
+    display: block;
+    width:200px;
+    height:120px;
+}
