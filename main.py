@@ -304,7 +304,7 @@ def editarUsuarioUser(id_user):
     datos = AdminUsuarios.update(request, user_key)
 
     if datos is not None:
-        return redirect(url_for('index'))
+        return redirect(url_for('root'))
 
     return render_template('admin/editarUsuario.html', datos=user)
 
