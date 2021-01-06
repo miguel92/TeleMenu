@@ -255,17 +255,18 @@ class AdminMenus():
 
 class misPedidos():
     @staticmethod
-    def getMisPedidos(user_id, estado):
+    def getMisPedidos(estado):
+        user_id = session['user']
         firebase = ConnectFirebase().firebase
         pedido = Pedido.getPedidos(user_id, firebase, estado)
         return pedido
-
+    '''
     @staticmethod
-    def getPedidosRestaurante(id_restaurante, estado):
+    def getPedidosRestaurante(id_restaurante):
         firebase = ConnectFirebase().firebase
-        pedido = Pedido.getPedidosRestaurante(id_restaurante, firebase, estado)
+        pedido = Pedido.getPedidosRestaurante(id_restaurante, firebase)
         return pedido
-
+    '''
     @staticmethod
     def deletePedido(id_pedido):
         firebase = ConnectFirebase().firebase
@@ -355,7 +356,7 @@ class usuario():
         firebase = ConnectFirebase().firebase
         return Usuario.consultarUsuario(id_user, firebase)
 
-    def getCoordDireccion(self):
+    def getCoordDireccion():
         user_id = session['user']
         firebase = ConnectFirebase().firebase
-        return Usuario.getCoordDireccion(user_id, firebase)
+        return Usuario().getCoordDireccion(user_id, firebase)

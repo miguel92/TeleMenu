@@ -91,8 +91,17 @@ def mapaRestaurantesCercanos():
     return render_template('map.html',map=map._repr_html_())
 
 @app.route('/pedidosCliente')
-def pedidos():
-    return render_template('pedidos.html', datos=None)
+def pedidosCliente():
+    pedidosPendientes = misPedidos.getMisPedidos("Pendiente")
+    pedidosTerminados = misPedidos.getMisPedidos("Terminado")
+    if len(pedidosPendientes) > 0 and len(pedidosTerminados) >0:
+        return render_template('pedidos.html', datos=pedidosPendientes, datos2=pedidosTerminados)
+    elif len(pedidosPendientes) > 0 and len(pedidosTerminados) ==0:
+        return render_template('pedidos.html', datos=pedidosPendientes, datos2=None)
+    elif len(pedidosPendientes) == 0 and len(pedidosTerminados) >0:
+        return render_template('pedidos.html', datos=None, datos2=pedidosTerminados)
+    else:
+        return render_template('pedidos.html', datos=None, datos2=None)
 
 @app.route('/pedidosRestaurante')
 def pedidosRestaurante():
@@ -132,7 +141,6 @@ def pedidosRestaurante():
                     hora = pedidos[key][key2]
             if key2=='Pedido':
                 precio=float(pedidos[key][key2]['Total'])
-                print(pedidos[key][key2]['Total'])
                 pedido=pedidos[key][key2]
                 for key in pedidos[key][key2]:
                     if key != 'Restaurante' and key != 'Total':
@@ -189,37 +197,16 @@ def pedidos(id_user):
     return render_template('pedidos.html', datos=pendiente, datos2=terminado)
 
 
-
-@app.route('/pedidosPendientes')
-def pedidosPendientes():
-    pedidos = misPedidos.getMisPedidos("Pendiente")
-    pedidosLista = list(pedidos)
-    if (pedidosLista.__len__() > 0):
-        return render_template('pedidosPendientes.html', datos=pedidos)
-    else:
-        return render_template('pedidosPendientes.html', datos=None)
-
 @app.route('/pedidosRestaurante/<id_pedido>')
 def actualizarEstadoPedido(id_pedido):
     misPedidos.actualizarEstadoPedido(id_pedido)
     return redirect(url_for('pedidosRestaurante'))
 
 
-
-@app.route('/pedidosAnteriores')
-def pedidosAnteriores():
-    pedidos = misPedidos.getMisPedidos("Terminado")
-    pedidosLista = list(pedidos)
-    if len(pedidosLista) > 0:
-        return render_template('pedidosAnteriores.html', datos=pedidos)
-    else:
-        return render_template('pedidosAnteriores.html', datos=None)
-
-
 @app.route('/borrarPedido/<id_pedido>', methods=["GET", "POST"])
 def borrarPedido(id_pedido):
     misPedidos.deletePedido(id_pedido)
-    return redirect(url_for('pedidos'))
+    return redirect(url_for('pedidosCliente'))
 
 
 @app.route('/listarMenusRestauranteWeb/<id_restaurante>', methods=["GET", "POST"])
@@ -231,18 +218,17 @@ def listarMenusRestauranteWeb(id_restaurante):
         pedido = request.get_json()
         if (pedido is not None):
             misPedidos.anadirPedidocesta(pedido)
-        return render_template('listaMenusRestaurante.html', datos=menus, restaurante=restaurante, tiempo=tiempo)
+        
+        return render_template('listaMenusRestaurante.html', datos=menus,id_restaurante=id_restaurante, restaurante=restaurante, tiempo=tiempo)
     else:
-        return render_template('listaMenusRestaurante.html', datos=None, restaurante=restaurante, tiempo=tiempo)
+        return render_template('listaMenusRestaurante.html', datos=None, id_restaurante=id_restaurante,restaurante=restaurante, tiempo=tiempo)
     
  
 @app.route("/cestaPedido", methods=["GET", "POST"])
 def listaPedidos():
     pedidosCesta = misPedidos.getPedidosCesta()
     pedido = request.get_json()
-    print(pedido)
     if pedido is not None and pedido['value']['Estado']=='Exito':
-        print(pedidosCesta)
         misPedidos.crearPedido(pedidosCesta, pedidosCesta['Restaurante'])
         misPedidos.borrarCesta()
     if pedidosCesta is not None:
@@ -351,7 +337,7 @@ def listarMenu():
 
 
 @app.route('/listarMenusRestaurante/<id_user>')
-def listarMenusRestaurante(id_user):
+def listarMenusRestauranteUser(id_user):
     if session['id'] != id_user:
         return redirect(url_for('listarMenusRestaurante', id_user=session['id']))
     # Obtener el usuario a partir de la id
@@ -446,7 +432,6 @@ def borrarRestaurante(id_restaurante):
 @app.route('/loginGoogle', methods=["GET", "POST"])
 def loginGoogle():
     perfil = request.get_json()
-    print(perfil)
     existe = Login().checkUser(perfil)
     data = json.dumps({'redirect': existe})
     return data
@@ -545,6 +530,7 @@ def callback():
     session['id'] = unique_id
     session['correo'] = users_email
 
+
     if user_by_id == []:
         print("usuario no existe")
         datosGoogle = {"id": unique_id, "nombre": users_name, "correo": users_email}
@@ -556,6 +542,7 @@ def callback():
     clave = list(user_by_id)[0]
     session['rol'] = user_by_id[clave]['rol']
     session['user'] = users_email
+    session['direccion'] = user_by_id[clave]['direccion']
     user = Usuario(
         id_=unique_id, name=users_name, email=users_email, rol=user_by_id[clave]['rol']
     )

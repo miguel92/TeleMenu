@@ -45,11 +45,37 @@
                         </ul>
                     </div>
                 {% endfor %}
-             	<div class='error' style='display:none; width:200px;height:20px;height:auto;position:absolute;background-color: #383838;left:100%;margin-left:-100px;color: #F0F0F0;top:10px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Men&uacute; a&ntilde;adido a la cesta.</div>
+             	<div class='error' style='display:none; width:200px;height:20px;height:auto;position:fixed;background-color: #383838;left:50%;margin-left:-50px;color: #F0F0F0;top:60px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Men&uacute; a&ntilde;adido a la cesta.</div>
             </div>
         {% endif %}
     </div>
-
+	
+	<script>
+	pedido = {}
+	function agregarPedido(nombre, precio){	
+		pedido['Nombre']=nombre;
+		pedido['Precio']=precio;
+		
+		pedido['Restaurante']='{{id_restaurante}}';
+		id_restaurante = '{{id_restaurante}}';
+		
+		$('.error').fadeIn(400).delay(3000).fadeOut(400); //fade out after 3 seconds
+		$.ajax({
+	          type: "POST",
+	          url: "../listarMenusRestauranteWeb/" + id_restaurante,
+	          contentType: "application/json;charset=utf-8",
+	          data: JSON.stringify({pedido}),
+	          dataType: "json",
+	          success: function(data, textStatus){
+	        	  if (data.redirect){
+	        		  
+	        		  window.location.href = data.redirect;
+	        	  }
+	          }
+	          });
+		
+	}
+	</script>
 {% endblock %}
 
 {% block javascript %}

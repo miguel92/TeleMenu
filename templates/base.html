@@ -65,7 +65,7 @@
               				</a>
                         </li>
                         <li>
-                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
+                            <a href="/pedidosRestaurante"> <span class="fas fa-cash-register icono_enlace"
                                                                                aria-hidden="true"></span> Pedidos</a>
                         </li>
                     {% endif %}
@@ -74,10 +74,6 @@
                         <li>
                             <a href="/editarUsuarioR/{{ session['user_id'] }}"> <span
                                     class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Tu usuario</a>
-                        </li>
-                        <li>
-                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
-                                                                               aria-hidden="true"></span> Pedidos</a>
                         </li>
                     {% endif %}
                 {% endif %}

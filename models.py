@@ -58,9 +58,9 @@ class Usuario(UserMixin):
         usuario = db.child("Usuarios").order_by_key().equal_to(id_usuario).get().val()
         return usuario
 
-    def getCoordDireccion(user_id, firebase):
+    def getCoordDireccion(self, user_id, firebase):
         db = firebase.database()
-        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        usuario = db.child("Usuarios").order_by_child("correo").equal_to(user_id).get().val()
         usuarioLista = list(usuario.values())
         direccion = usuarioLista[0]['direccion']
         geolocator = Nominatim(user_agent="building-an-app-1")
@@ -115,25 +115,27 @@ class Pedido():
         db = firebase.database()
         pedidos = db.child("Pedidos").order_by_child("Cliente").equal_to(user_id).get().val()
         pedidosEstado = {}
-        for key, value in pedidos.items():
-            if (value['Estado'] == estado):
-                pedidosEstado[key] = value
+        if len(pedidos) > 0:
+            for key, value in pedidos.items():
+                if (value['Estado'] == estado):
+                    pedidosEstado[key] = value
+        
         return pedidosEstado
     def deletePedido(self,id_pedido,firebase):
         db = firebase.database()
         db.child("Pedidos").child(id_pedido).remove()
-    def crearPedido(self,pedido, firebase, id_restaurante, user_id, direccion):
+    def crearPedido(self, pedido, firebase, id_restaurante, user_id, direccion):
         db = firebase.database()
         now = time.strftime("%d/%m/%y")
         hora = time.strftime("%I:%M:%S")
         total = list(pedido)[0]
-        coordenadas = Usuario.getCoordDireccion(user_id, firebase)
+        coordenadas = Usuario().getCoordDireccion(user_id, firebase)
         coordenadas = [coordenadas.latitude, coordenadas.longitude]
         data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido, "Restaurante": id_restaurante, "Coordenadas": coordenadas, "Direccion": direccion}
         db.child("Pedidos").push(data)
     def getPedidosRestaurante(self,user_id, firebase):
         db = firebase.database()
-        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        usuario = db.child("Usuarios").order_by_child("correo").equal_to(user_id).get().val()
         correoRestaurante = list(usuario.values())[0]['correo']
         restaurante = db.child("Restaurantes").order_by_child("correo").equal_to(correoRestaurante).get().val()
         id_restaurante = list(restaurante.keys())[0]
@@ -174,7 +176,8 @@ class Pedido():
             if key != 'Restaurante' and key != 'id': 
                 total = total + float(pedido[key])
         return total
-
+    
+    '''
     @staticmethod
     def getPedidosRestaurante(id_restaurante, firebase, estado):
         db = firebase.database()
@@ -185,18 +188,10 @@ class Pedido():
             if value['Estado'] == estado:
                 pedidos[key] = value
         return pedidos
-
+    '''
     def deletePedido(self, id_pedido, firebase):
         db = firebase.database()
         db.child("Pedidos").child(id_pedido).remove()
-
-    def crearPedido(self, pedido, firebase, id_restaurante, user_id):
-        db = firebase.database()
-        now = time.strftime("%d/%m/%y")
-        hora = time.strftime("%I:%M:%S")
-        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha": now, "Hora": hora, "Pedido": pedido['pedido'],
-                "Restaurante": id_restaurante}
-        db.child("Pedidos").push(data)
 
 
 
@@ -260,7 +255,7 @@ class Restaurante():
 
     def getRestaurantesCercanosMapa(user_id, firebase):
         db = firebase.database()
-        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        usuario = db.child("Usuarios").order_by_child("correo").equal_to(user_id).get().val()
         usuarioLista = list(usuario.values())
         direccion = usuarioLista[0]['direccion']
         geolocator = Nominatim(user_agent="building-an-app-1")
