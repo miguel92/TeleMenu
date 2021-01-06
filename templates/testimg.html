@@ -1,0 +1,23 @@
+{% extends "admin/main.html" %}
+{% block body %}
+
+	<h3>Creaci&oacute;n de men&uacute;</h3>
+	<div class="row">
+    <div class="col-md-12">
+        <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+           
+            <div class="custom-file">
+	              		<label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
+					    <input type="file" name="fotoPlato" class="custom-file-input" id="fotoPlato" >
+					    <div class="invalid-feedback">Example invalid custom file feedback</div>
+			</div>
+            <div class="form-group text-center">
+                <button type="submit" value="submit" class="btn btn-warning">Crear</button>
+                <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
+            </div>
+        </form>
+    </div>
+    <img src="{{datos}}">
+</div>
+
+{% endblock %}

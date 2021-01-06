@@ -45,3 +45,4 @@ numpy==1.19.3
 oauthlib==3.0.1
 pyOpenSSL==19.0.0
 Flask-Login==0.4.1
+flickr_api

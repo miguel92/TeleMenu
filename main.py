@@ -14,7 +14,7 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario
+from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario,Imagen
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import ConnectFirebase, Pedido, Usuario
 import folium
@@ -36,6 +36,7 @@ from flask_login import (
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 
+
 # Configuration
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 GOOGLE_CLIENT_ID = "724763817794-ggc2ttdiijonm72qd27s1fjkk3a0sglm.apps.googleusercontent.com"
@@ -51,7 +52,6 @@ app.secret_key = GOOGLE_CLIENT_SECRET
 @app.route('/')
 def root():
     return render_template('wb.html', datos=None)
-
 
 @app.route('/searchLista')
 def searchLista():
@@ -471,7 +471,11 @@ def salir():
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
 
-
+@app.route("/testimg",methods=["GET", "POST"])
+def testimg():
+    url = Imagen().getImagen("50807284003")
+    Imagen().subirImagen(request);
+    return render_template('testimg.html', datos = url)
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

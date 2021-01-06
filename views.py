@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
-import firebase
-
+import firebase,os
+from auth_img import Flickr
+import flickr_api, requests,json
 
 class Login():
     def get(request):
@@ -338,3 +339,47 @@ class usuario():
         user_id = session['user']
         firebase = ConnectFirebase().firebase
         return Usuario.getCoordDireccion(user_id, firebase)
+class Imagen():
+    def subirImagen(self,request):
+        if request.method == 'POST':
+            cliente = Flickr().autenticacionFlickr()
+            f = request.files['fotoPlato']
+            f.save('tmp_img/'+f.filename)
+            foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title="My title")
+            os.remove('tmp_img/'+f.filename)
+            photosets = cliente.getPhotosets()
+            print(photosets[0])
+            photosets[0].addPhoto(photo = foto)
+    def getImagen(self,id_foto):
+            api_key = 'ad53b2717df3f7c91bddf3e9a38ecc29'
+            user_id = "191734611@N08"
+            photoset_id = "72157717756668921"
+            url = self.get_requestURL(user_id,api_key,endpoint="getList") 
+            strlist = requests.get(url).content
+            json_data = json.loads(strlist)
+            albums = json_data["photosets"]["photoset"]
+            url = self.get_requestURL(user_id,api_key,endpoint="getPhotos") + "&photoset_id=" + photoset_id
+            strlist = requests.get(url).content
+            json1_data = json.loads(strlist) 
+            url = None
+            encontrado = False;
+            contador = 0;
+            while (contador < len(json1_data["photoset"]["photo"])) and (encontrado == False):
+                pic = json1_data["photoset"]["photo"][contador]
+                if pic["id"] == id_foto :
+                    url = self.get_photo_url(pic["farm"],pic['server'], pic["id"], pic["secret"])
+                    encontrado = True
+                contador = contador +1
+            return url 
+    def get_photo_url(self,farmId,serverId,Id,secret):
+        return (("https://farm" + str(farmId) + 
+                ".staticflickr.com/" + serverId + 
+                "/" + Id + '_' + secret + ".jpg"))
+    def get_requestURL(self,user_id,api_key,endpoint="getList"):
+        user_id = user_id.replace("@","%40")
+        url_upto_apikey = ("https://api.flickr.com/services/rest/?method=flickr.photosets." + 
+                           endpoint + 
+                           "&api_key=" +  api_key +  
+                           "&user_id=" +  user_id +
+                           "&format=json&nojsoncallback=1")
+        return(url_upto_apikey)        
