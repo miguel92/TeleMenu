@@ -7,11 +7,17 @@
     {% if session['error'] %}
         <div class="alert alert-danger">{{ session['error'] }}</div>
     {% endif %}
-    <h3>Actualizaci&oacute;n de usuarios</h3>
+    <h3>Actualizaci&oacute;n de usuario</h3>
     <p/>
-
+	
     <div class="row">
         <div class="col-md-12">
+        {% if session['rol'] == 'restaurante' %}
+        <ul class="nav nav-tabs" style="margin-bottom:20px;">
+		  <li class="active"><a href="/editarUsuarioR/{{ session['user_id'] }}">Datos Usuario</a></li>
+		  <li><a href="/editarRestauranteR/{{ session['user_id'] }}">Datos Restaurante</a></li>
+		</ul>
+		{% endif %}
             <form class="form-horizontal" role="form" action="" method="post">
                 {% for key,value in datos.items() %}
                     <div class="form-group">

@@ -12,6 +12,12 @@
     </div>
     <div class="row">
         <div class="col-md-12">
+        {% if session['rol'] == 'restaurante' %}
+        <ul class="nav nav-tabs" style="margin-bottom:20px;">
+		  <li><a href="/editarUsuarioR/{{ session['user_id'] }}">Datos Usuario</a></li>
+		  <li class="active"><a href="/editarRestauranteR/{{ session['user_id'] }}">Datos Restaurante</a></li>
+		</ul>
+		{% endif %}
             <form class="form-horizontal" role="form" action="" method="post">
                 <div class="form-group">
                     <label for="inputNombreRestaurante" class="col-sm-3 control-label">Nombre</label>
