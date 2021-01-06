@@ -19,6 +19,8 @@ from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Pedido
 import folium
 import unicodedata
+import time
+from flask.templating import render_template_string
 
 app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'esto-es-una-clave-muy-secreta'
@@ -51,26 +53,109 @@ def mapaRestaurantesCercanos():
         nombre = unicodedata.normalize('NFD', mark.name)
         nombre = nombre.encode("utf8").decode("ascii","ignore")
         key = listarRestaurantes.getKeyRestaurante(nombre)
-        html = folium.Html('<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>', script=True)
-        folium.Marker(
-            name = "hola",
-            location=lat_lng,
-            popup=folium.Popup(html, max_width=300, height=500),
-            tooltip="Click aqui"
-        ).add_to(map)
+        if (key is not None):
+            html = folium.Html('<div style="text-align:center"><h4>' + nombre + '</h4><a href="/listarMenusRestauranteWeb/' + key + '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Ver Menus</a></div>', script=True)
+            folium.Marker(
+                name = "hola",
+                location=lat_lng,
+                popup=folium.Popup(html, max_width=300, height=500),
+                tooltip="Click aqui"
+            ).add_to(map)
     return render_template('map.html',map=map._repr_html_())
-@app.route('/pedidos')
+
+@app.route('/pedidosCliente')
 def pedidos():
     return render_template('pedidos.html', datos=None)
 
+@app.route('/pedidosRestaurante')
+def pedidosRestaurante():
+    pedidos = misPedidos.getPedidosRestaurante()
+    misCoord = usuario.getCoordDireccion()
+    
+    map = folium.Map(
+        left='20%',
+        width=700,
+        height=500,
+        location = [misCoord.latitude, misCoord.longitude],
+        zoom_start = 15
+    )
+
+    lat_lng=(0,0)
+    pedido=""
+    nombre=""
+    precio=0.0
+    estado=""
+    direccion=""
+    id_pedido=""
+    cont=0
+    for key in pedidos:
+        id_pedido=key
+        for key2 in pedidos[key]:
+            if key2=='Fecha':
+                if pedidos[key][key2]!=time.strftime("%d/%m/%y"):
+                    break
+
+            if key2=='Coordenadas':
+                    lat = pedidos[key][key2][0]
+                    lng = pedidos[key][key2][1]
+                    lat_lng = (lat,lng)
+            if key2=='Estado':
+                    estado = pedidos[key][key2]
+            if key2=='Hora':
+                    hora = pedidos[key][key2]
+            if key2=='Pedido':
+                precio=float(pedidos[key][key2]['Total'])
+                print(pedidos[key][key2]['Total'])
+                pedido=pedidos[key][key2]
+                for key in pedidos[key][key2]:
+                    if key != 'Restaurante' and key != 'Total':
+                        if cont == 0: 
+                            nombre= key
+                            cont = cont + 1
+                        else:
+                            nombre = nombre + ", " + key
+                    
+            if key2=='Estado':
+                    estado=pedidos[key][key2]
+            if key2 =='Direccion':
+                    direccion = pedidos[key][key2]
+ 
+        if estado=='Pendiente':
+                html = folium.Html('<div style="text-align:left"><h5>Pedido: ' + nombre+' </h5><p>Precio: ' + str(precio) + '</p><p>Estado: ' + estado + '</p><p>Hora: ' + hora + '</p><p>Direccion: ' + direccion + '</p><a href= "/pedidosRestaurante/' + id_pedido+ '" class="btn btn-success enlaceMenusMapa" target="_top"><i class="fas fa-utensils"></i> Confirmar pedido</a></div>', script=True)
+                folium.Marker(
+                    location=lat_lng,
+                    popup=folium.Popup(html, max_width=300, height=500),
+                    tooltip="Click aqui",
+                    icon=folium.Icon(color='orange')
+                    ).add_to(map)
+        elif estado=='Terminado':
+                html = folium.Html('<div style="text-align:left"><h5>Pedido:' + nombre+' </h5><p>Precio: ' + str(precio) + '</p><p>Estado: ' + estado + '</p><p>Hora: ' + hora + '</p><p>Direccion: ' + direccion + '</p></div>', script=True)
+                folium.Marker(
+                    location=lat_lng,
+                    popup=folium.Popup(html, max_width=300, height=500),
+                    tooltip="Click aqui",
+                    icon=folium.Icon(color='green')
+                    ).add_to(map)              
+    return render_template('mapPedidos.html', map=map._repr_html_())
+
 @app.route('/pedidosPendientes')
 def pedidosPendientes():
-    pedidos = misPedidos.getMisPedidos("pendiente")
-    return render_template('pedidosPendientes.html', datos=pedidos)
+    pedidos = misPedidos.getMisPedidos("Pendiente")
+    pedidosLista = list(pedidos)
+    if (pedidosLista.__len__() > 0):
+        return render_template('pedidosPendientes.html', datos=pedidos)
+    else:
+        return render_template('pedidosPendientes.html', datos=None)
+
+@app.route('/pedidosRestaurante/<id_pedido>')
+def actualizarEstadoPedido(id_pedido):
+    misPedidos.actualizarEstadoPedido(id_pedido)
+    return redirect(url_for('pedidosRestaurante'))
+
 
 @app.route('/pedidosAnteriores')
 def pedidosAnteriores():
-    pedidos = misPedidos.getMisPedidos("terminado")
+    pedidos = misPedidos.getMisPedidos("Terminado")
     pedidosLista = list(pedidos)
     if (pedidosLista.__len__() > 0):
         return render_template('pedidosAnteriores.html', datos=pedidos)
@@ -88,14 +173,35 @@ def listarMenusRestauranteWeb(id_restaurante):
     if (menus.__len__() > 0):
         pedido = request.get_json()
         if (pedido is not None):
-            misPedidos.crearPedido(pedido, id_restaurante)
-        
-        return render_template('listaMenusRestaurante.html', datos=menus)
+            misPedidos.anadirPedidocesta(pedido)
+        return render_template('listaMenusRestaurante.html', datos=menus, id_restaurante=id_restaurante)
     else:
         return render_template('listaMenusRestaurante.html', datos=None)
     
-       
+ 
+@app.route("/cestaPedido", methods=["GET", "POST"])
+def listaPedidos():
+    pedidosCesta = misPedidos.getPedidosCesta()
+    pedido = request.get_json()
+    print(pedido)
+    if pedido is not None and pedido['value']['Estado']=='Exito':
+        print(pedidosCesta)
+        misPedidos.crearPedido(pedidosCesta, pedidosCesta['Restaurante'])
+        misPedidos.borrarCesta()
+    if pedidosCesta is not None:
+        return render_template('cestaPedido.html', datos=pedidosCesta)
+    else:
+        return render_template('cestaPedido.html', datos=None)
 
+@app.route("/vaciarCesta", methods=["GET", "POST"])
+def vaciarCesta():
+    misPedidos.borrarCesta()
+    return render_template('cestaPedido.html', datos=None)
+
+@app.route("/pedidoRealizado", methods=["GET", "POST"])
+def pedidoRealizado():
+    return render_template('pedidoRealizado.html')
+    
 @app.route("/signup", methods=["GET", "POST"])
 def show_signup_form():
     datos= Login.get(request)
@@ -155,7 +261,7 @@ def logout():
     session.pop('user_id',None)
     session.pop('rol',None)
     session.clear()
-    
+    misPedidos.borrarCesta()
     return redirect(url_for('root'))
 
 @app.route('/listarMenu')

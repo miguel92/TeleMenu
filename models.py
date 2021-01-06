@@ -77,19 +77,68 @@ class Menu():
 class Pedido():
     def getPedidos(user_id,firebase,estado):
         db = firebase.database()
-        #cliente = db.child("Pedidos").order_by_child("Cliente").equal_to(user_id)
-        pedidos = db.child("Pedidos").order_by_child("Estado").equal_to(estado).get().val()
-        return pedidos
+        pedidos = db.child("Pedidos").order_by_child("Cliente").equal_to(user_id).get().val()
+        pedidosEstado = {}
+        for key, value in pedidos.items():
+            if (value['Estado'] == estado):
+                pedidosEstado[key] = value
+        return pedidosEstado
     def deletePedido(self,id_pedido,firebase):
         db = firebase.database()
         db.child("Pedidos").child(id_pedido).remove()
-    def crearPedido(self,pedido, firebase, id_restaurante, user_id):
+    def crearPedido(self,pedido, firebase, id_restaurante, user_id, direccion):
         db = firebase.database()
         now = time.strftime("%d/%m/%y")
         hora = time.strftime("%I:%M:%S")
-        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido['pedido'], "Restaurante": id_restaurante}
+        total = list(pedido)[0]
+        coordenadas = Usuario.getCoordDireccion(user_id, firebase)
+        coordenadas = [coordenadas.latitude, coordenadas.longitude]
+        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido, "Restaurante": id_restaurante, "Coordenadas": coordenadas, "Direccion": direccion}
         db.child("Pedidos").push(data)
-        
+    def getPedidosRestaurante(self,user_id, firebase):
+        db = firebase.database()
+        usuario = db.child("Usuarios").order_by_key().equal_to(user_id).get().val()
+        correoRestaurante = list(usuario.values())[0]['correo']
+        restaurante = db.child("Restaurantes").order_by_child("correo").equal_to(correoRestaurante).get().val()
+        id_restaurante = list(restaurante.keys())[0]
+        pedidos = db.child("Pedidos").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
+        return pedidos;
+    def actualizarEstadoPedido(self,id_pedido, firebase):
+        db = firebase.database()
+        pedido = db.child("Pedidos").child(id_pedido).update({"Estado" : "Terminado"})
+    def anadirPedidocesta(self,pedido, firebase):
+        db = firebase.database()
+        db.child("Cesta").push(pedido)
+    def getPedidosCesta(self, firebase):
+        db = firebase.database()
+        pedidosCesta = db.child("Cesta").get().val()
+        if (pedidosCesta is not None) :
+            pedidoCesta = {}
+            cont=2
+            total=0.0
+            for pedido in pedidosCesta:
+                if pedidoCesta.get(pedidosCesta[pedido]['pedido']['Nombre']) is not None:  
+                    total = total + float(pedidosCesta[pedido]['pedido']['Precio'])   
+                    pedidoCesta[pedidosCesta[pedido]['pedido']['Nombre']]= pedidosCesta[pedido]['pedido']['Precio'] + ' x ' + str(cont)
+                    cont=cont+1
+                else:
+                    pedidoCesta[pedidosCesta[pedido]['pedido']['Nombre']] = pedidosCesta[pedido]['pedido']['Precio']
+                    total = total +float(pedidosCesta[pedido]['pedido']['Precio'])
+                    pedidoCesta['Restaurante'] = pedidosCesta[pedido]['pedido']['Restaurante']
+            pedidoCesta['Total'] = total
+            return pedidoCesta
+        else:
+            return None
+    def borrarCesta(self, firebase):
+        db = firebase.database()
+        db.child("Cesta").remove()
+    def getTotal(pedido):
+        total=0.0
+        for key in pedido:
+            if key != 'Restaurante' and key != 'id': 
+                total = total + float(pedido[key])
+        return total
+      
 class Restaurante():
     def crearRestaurante(data,firebase):
         db = firebase.database()
@@ -129,11 +178,14 @@ class Restaurante():
         google_places = GooglePlaces(api_key)
         query_result = google_places.nearby_search(
                 lat_lng={'lat': location.latitude, 'lng': location.longitude}, keyword='Restaurante',
-                radius=30, types=[types.TYPE_RESTAURANT])
+                radius=200, types=[types.TYPE_RESTAURANT])
         
         return query_result.places
     def getKeyRestaurante(firebase, nombre):
         db = firebase.database()
         restaurante = db.child("Restaurantes").order_by_child("Nombre").equal_to(nombre).get().val()
-        restauranteKey = list(restaurante.keys())[0]
-        return restauranteKey
+        if (len(restaurante)>0):
+            restauranteKey = list(restaurante.keys())[0]
+            return restauranteKey
+        else:
+            return None

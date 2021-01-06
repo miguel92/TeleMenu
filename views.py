@@ -1,6 +1,7 @@
 from flask import Flask,render_template, request, redirect, url_for,session
 from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
 import firebase
+from pyasn1_modules.rfc2459 import id_pe
 
 class Login():
     def get(request):
@@ -24,10 +25,12 @@ class Login():
                     
                     db = firebase.database()
                     user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
-                    clave = list(user_by_id)[0]                   
+                    clave = list(user_by_id)[0]
+                                      
                    
                     session['user'] = clave
                     session['rol'] = user_by_id[clave]['rol']
+                    session['direccion'] = user_by_id[clave]['direccion']
 
                     if session['rol'] == "restaurante":
                         res = Restaurante().getRestauranteByCorreo(correo,firebase)
@@ -218,8 +221,25 @@ class misPedidos():
         Pedido().deletePedido(id_pedido,firebase)
     def crearPedido(pedido, id_restaurante):
         user_id = session['user']
+        direccion = session['direccion']
         firebase = ConnectFirebase().firebase
-        Pedido().crearPedido(pedido, firebase, id_restaurante, user_id)
+        Pedido().crearPedido(pedido, firebase, id_restaurante, user_id, direccion)
+    def getPedidosRestaurante():
+        id_restaurante = session['user']
+        firebase = ConnectFirebase().firebase
+        return Pedido().getPedidosRestaurante(id_restaurante, firebase)
+    def actualizarEstadoPedido(id_pedido):
+        firebase = ConnectFirebase().firebase
+        Pedido().actualizarEstadoPedido(id_pedido, firebase)
+    def anadirPedidocesta(pedido):
+        firebase = ConnectFirebase().firebase
+        Pedido().anadirPedidocesta(pedido, firebase)
+    def getPedidosCesta():
+        firebase = ConnectFirebase().firebase
+        return Pedido().getPedidosCesta(firebase)
+    def borrarCesta():
+        firebase = ConnectFirebase().firebase
+        Pedido().borrarCesta(firebase)
         
 class listarRestaurantes():
     def getListaRestaurantes():

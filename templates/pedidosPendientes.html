@@ -9,17 +9,24 @@
 	    <thead>
 	      <tr>
 	        <th>Nombre</th>
-	        <th>Acciones</th>
 	      </tr>
 	    </thead>
 	    <tbody>
 	    {% for key, value in datos.items() %}
 	      <tr>
-	        <td>{{value['Pedido']}}</td>
-	        <td>
-	        	<a href="/borrarPedido key }}"><i class="fas fa-trash"></i></a>
+	      	{% if value['Pedido'] != "Restaurante" %}
+	        <td>{% for key in value['Pedido'].keys() %}
+	        {%if key != 'Restaurante'%} 
+	        {%if key == 'Total'%}
+	        <em>{{key}}: {{value['Pedido'][key]}} Eur.</em>
+	        {%else%}
+	        <em>{{key}}, </em>
+	        {%endif%}
+	        {%endif%}
+	        {%endfor%}
 	        </td>
 	      </tr>
+	      {% endif %}
 	      </tr>
 	     {%endfor%}
 	    </tbody>

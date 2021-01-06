@@ -2,6 +2,27 @@
 {% block content %}
 
 {% if datos == None %}
+<style>
+.error {
+    width:200px;
+    height:20px;
+    height:auto;
+    position:absolute;
+    left:50%;
+    margin-left:-100px;
+    bottom:10px;
+    background-color: #383838;
+    color: #F0F0F0;
+    font-family: Calibri;
+    font-size: 20px;
+    padding:10px;
+    text-align:center;
+    border-radius: 2px;
+    -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+    -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+    box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+}
+</style>
 <h2>A&uacute;n no hay men&uacute;s de este restaurante</h2>
 {% else %}
 <div class="row">
@@ -13,45 +34,58 @@
 					<a href="#1" class="list-group-item">
 						<h4>{{value['Nombre']}}</h4>
 						<p>{{value['Ingredientes']}}</p>
-						<p>Precio: {{value['Precio']}} </p>
-						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}')" /> </p>
+						<p>Precio: {{value['Precio']}} Eur. </p>
+						<p align="right"> <input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{value['Nombre']}}', '{{value['Precio']}}')" /> </p>
 					</a>
 				</ul>
 		</div>
 		{%endfor%}
+		<div class='error' style='display:none; width:200px;height:20px;height:auto;position:absolute;background-color: #383838;left:100%;margin-left:-100px;color: #F0F0F0;top:10px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Men&uacute; a&ntilde;adido a la cesta.</div>
 	  </div>
-	<div class="col-sm-6">
-		<h3 id="pedido">Tu pedido:</h3>
-				<ul id="ulListaPedido" class="list-group" style="visibility: hidden;">
-					<a href="#2" class="list-group-item">
-						<p id="haPedido" style="visibility: visible;">A&uacute;n no has pedido nada.</p>
-						<h4 id="listaPedido"></h4>
-						<p align="right"> <input type="button" value="Confirmar pedido" class="btn btn-success" onclick="crearPedido()"/> </p>
-					</a>
-				</ul>
+	  
 		<script>
-		var capa = document.getElementById("listaPedido");
-		let pedido = []
-		function agregarPedido(nombre){		
-			pedido.push(nombre);
-		  	var h1 = document.createElement("h4");
-		  	h1.textContent = nombre;
-		  	document.getElementById("haPedido").style.visibility = "hidden";
-		  	document.getElementById("ulListaPedido").style.visibility = "visible";
-		  	capa.appendChild(h1);
+		function showNotification() {
+
 		}
-		
-		function crearPedido(){
+		pedido = {}
+		function agregarPedido(nombre, precio){	
+			pedido['Nombre']=nombre;
+			pedido['Precio']=precio;
+			
+			pedido['Restaurante']='{{id_restaurante}}'
+			id_restaurante = '{{id_restaurante}}'
+			
+			$('.error').fadeIn(400).delay(3000).fadeOut(400); //fade out after 3 seconds
 			$.ajax({
 		          type: "POST",
+		          url: "../listarMenusRestauranteWeb/" + id_restaurante,
 		          contentType: "application/json;charset=utf-8",
-		          traditional: "true",
 		          data: JSON.stringify({pedido}),
-		          dataType: "json"
+		          dataType: "json",
+		          success: function(data, textStatus){
+		        	  console.log("sdsad");
+		        	  if (data.redirect){
+		        		  
+		        		  window.location.href = data.redirect;
+		        	  }
+		          }
 		          });
+			
 		}
+		
+		
+		function rederigir(){
+			if (hayPedido){
+				console.log(hayPedido);
+				location.href = '/pedidoRealizado';					
+			}
+		}
+	
 		</script>
-		</div>
+		
 </div>
+
 {% endif %}
+
+	
 {% endblock %}

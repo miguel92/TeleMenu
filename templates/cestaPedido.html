@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+	<div class="col-sm-6">
+	<h3 id="pedido">Tu pedido:</h3>
+	{% if datos == None %}
+	<h4>Tu cesta est&aacute; vac&iacute;a</h4>
+	{% else %}
+	{% for key, value in datos.items() %}
+		{% if key != "Restaurante" and key != "Total" %}
+			<ul id="ulListaPedido" class="list-group" style="visibility: visible;">
+				<a href="#1" class="list-group-item">
+				
+					<p id="haPedido" style="visibility: visible;">{{key}}</p>
+					<p id="haPedido" style="visibility: visible;">{{value}} Eur.</p>
+					<h4 id="listaPedidoCesta"></h4>
+				</a>
+				
+			</ul>
+		{% endif %}
+			
+	{%endfor%}
+	<p align="right"><strong>Total: {{datos['Total']}} Eur.</strong></p>
+	<p align="right"> <input type=button value="Confirmar pedido" class="btn btn-success" onclick="crearPedido()"/> 
+	<b align="left"> <a href="/vaciarCesta"><input type=button class="btn btn-primary" value="Vaciar cesta"></input></a>
+	</p>
+	
+	{% endif %}
+	</div>
+	<script>
+	
+	function crearPedido(){
+		dato = {}
+		dato['Estado'] = 'Exito';
+       var xhr = new XMLHttpRequest();
+	   xhr.onreadystatechange = function() { // listen for state changes
+     	  if (xhr.readyState == 4 && xhr.status == 200) { // when completed we can move away
+     	    window.location = "/pedidoRealizado";
+     	  }
+     	}
+       xhr.open("POST", "/cestaPedido", true);
+       xhr.setRequestHeader('Content-Type', 'application/json');
+       xhr.send(JSON.stringify({
+           value: dato
+       }));
+		//window.location.href = '/pedidoRealizado';
+	}
+	
+	</script>
+
+
+{% endblock %}
