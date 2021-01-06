@@ -1,34 +1,44 @@
 {% extends "admin/main.html" %}
 {% block body %}
-	{% if datos is not none %}
-	<h3>Tabla de men&uacute;s</h3>
-	  <table class="table">
-	    <thead>
-	      <tr>
-	        <th>Nombre</th>
-	        <th>Acciones</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	    {% for key, value in datos.items() %}
+    <div class="col-lg-12 text-center">
+        {% if session['rol'] == 'restaurante' %}
+            <h1>Menús</h1>
+        {% endif %}
+        {% if session['error'] %}
+            <div class="alert alert-danger">{{ session['error'] }}</div>
+        {% endif %}
+        {% if datos %}
+            <h3>Tabla de men&uacute;s</h3>
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, value in datos.items() %}
 	      <tr>
 	        <td>{{value['Nombre']}} <td>
 	        	<a href="/editarMenu/{{ key }}"><i class="fas fa-edit"></i></a>
 	        	<a href="/borrarMenu/{{ key }}"><i class="fas fa-trash"></i></a>
 	 
 			    <a class="twitter-share-button"
-		 		 href="https://twitter.com/intent/tweet?text=%C2%A1Acude%20a%20nuestro%20restaurante%20a%20probar%20nuestro%20menu%21%0A{{value['Nombre']}}%0AIngredientes%3A%20{{value['Ingredientes']}}%0ARestaurante%3A%20{{value['Restaurante']}}%0AWeb%3A%20&url={{request.url}}"
-		 	 	data-size="large">
-				<i class="fab fa-twitter-square" style="font-size: 17px"></i></a>  </td>
-				
-	      </tr>
-	      </tr>
-	     {%endfor%}
-	    </tbody>
-	  </table>
-	  {%else%}
-	  	<h3>No hay men&uacute;s creados</h3>
-	  {% endif %}
+                   href="https://twitter.com/intent/tweet?text=%C2%A1Acude%20a%20nuestro%20restaurante%20a%20probar%20nuestro%20menu%21%0A{{value['Nombre']}}%0AIngredientes%3A%20{{value['Ingredientes']}}%0ARestaurante%3A%20{{value['Restaurante']}}%0AWeb%3A%20&url={{request.url}}"
+                   data-size="large">
+                    <i class="fab fa-twitter-square" style="font-size: 17px"></i></a></td>
 
-
+          </tr>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h3>No hay men&uacute;s creados</h3>
+            </div>
+        {% endif %}
+    {% if session['rol'] == 'restaurante' %}
+        <div class="panel-footer"><a href="/crearMenu"><i class="fas fa-plus"></i> Crear Men&uacute</a></div>
+    {% endif %}
 {% endblock %}
