@@ -19,27 +19,33 @@
             <a id="realizado" class="btn btn-default">Pedidos Realizados</a>
         </div>
 
-        <div id="pendiente_lista" class="row" style="display: block;">
+        <div id="pendiente_lista" class="row">
             <h3>Pedidos pendientes de entrega</h3>
-            {% if datos %}
+            {% if datos != None %}
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th class="text-center">Nombre</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for key, value in datos.items() %}
-                        <tr>
-                            <td>{{ value['Pedido'] }}</td>
-                            <td>
-                                <a href="/pedidoRealizado/{{ key }}"><i class="fas fa-check"></i></a>
-                                <a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        </tr>
-                    {% endfor %}
+				    {% for key, value in datos.items() %}
+				      <tr>
+				      	{% if value['Pedido'] != "Restaurante" %}
+				        <td>{% for key in value['Pedido'].keys() %}
+				        {%if key != 'Restaurante'%} 
+				        {%if key == 'Total'%}
+				        <em>{{key}}: {{value['Pedido'][key]}} Eur.</em>
+				        {%else%}
+				        <em>{{key}}, </em>
+				        {%endif%}
+				        {%endif%}
+				        {%endfor%}
+				        </td>
+				      </tr>
+				      {% endif %}
+				      </tr>
+				     {%endfor%}
                     </tbody>
                 </table>
             {% else %}
@@ -48,41 +54,36 @@
         </div>
         <div id="terminado_lista" class="row" style="display: none;">
             <h3>Pedidos terminados</h3>
-            {% if datos2 %}
+
+            {% if datos2 != None %}
                 <table class="table">
                     <thead>
                     <tr>
-                        <th class="text-center">Persona</th>
-                        <th class="text-center">Direcci&oacute;n</th>
                         <th class="text-center">Pedido</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
-
-                    {% for key, value in datos2.items() %}
-                        <tr>
-                            <td>
-                                {{ value['Cliente'] }}
-                            </td>
-                            <td>
-                                {{ value['Direccion'] }}
-                            </td>
-                            <td>
-                                {% for k,v in value['Pedido'].items() %}
-                                    {% if k != 'Restaurante' %}
-                                        {{ k }}: {{ v }}
-                                        <br/>
-                                    {% endif %}
-                                {% endfor %}
-
-                            </td>
-                            <td>
-                                <a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        </tr>
-                    {% endfor %}
+				    {% for key, value in datos2.items() %}
+				      <tr>
+				      	{% if value['Pedido'] != "Restaurante" %}
+				        <td>{% for key in value['Pedido'].keys() %}
+				        {%if key != 'Restaurante'%} 
+				        {%if key == 'Total'%}
+				        <em>{{key}}: {{value['Pedido'][key]}} Eur.</em>
+				        {%else%}
+				        <em>{{key}}, </em>
+				        {%endif%}
+				        {%endif%}
+				        {%endfor%}
+				        </td>
+				        <td>
+				        	<a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
+				        </td>
+				      </tr>
+				      {% endif %}
+				      </tr>
+				     {%endfor%}
                     </tbody>
                 </table>
             {% else %}

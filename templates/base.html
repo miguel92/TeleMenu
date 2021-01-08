@@ -57,7 +57,7 @@
                     <a style="color:white" href="/searchLista"> <i class="fas fa-search icono_enlace"></i>Buscar Restaurantes</a>
                 </li>
                 {% if session['user'] %}
-                    {% if session['rol'] == 'restaurante' %}
+                {% if session['rol'] == 'restaurante' %}
                         <li>
                             <a href="/listarMenusRestaurante/{{ session['user_id'] }}"> 
                             	<span class="fas fa-clipboard-list icono_enlace" aria-hidden="true"></span>
@@ -65,21 +65,22 @@
               				</a>
                         </li>
                         <li>
-                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
+                            <a href="/pedidosRestaurante"> <span class="fas fa-cash-register icono_enlace"
                                                                                aria-hidden="true"></span> Pedidos</a>
                         </li>
                     {% endif %}
-                    
-                    {% if session['rol'] == 'cliente' %}
-                        <li>
-                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <span
-                                    class="glyphicon glyphicon-user icono_enlace" aria-hidden="true"></span> Tu usuario</a>
-                        </li>
-                        <li>
-                            <a href="/pedidos/{{ session['user_id'] }}"> <span class="fas fa-cash-register icono_enlace"
-                                                                               aria-hidden="true"></span> Pedidos</a>
-                        </li>
-                    {% endif %}
+                  
+                {% endif %}
+                
+                {% if session['user'] %}
+                {% if session['rol'] == 'cliente' %}
+	                <li>
+	                   <a href="/pedidosCliente"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Mis pedidos</a>
+	                </li>
+	                <li>
+	                   <a href="/cestaPedido"> <i class="fas fa-shopping-cart icono_enlace" aria-hidden="true"></i> Lista de pedidos</a>
+	                </li>	                
+                 {% endif %}
                 {% endif %}
 
             </ul>

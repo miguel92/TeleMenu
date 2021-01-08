@@ -3,6 +3,7 @@ from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
 import firebase,os
 from auth_img import Flickr
 import flickr_api, requests,json
+from pyasn1_modules.rfc2459 import id_pe
 
 class Login():
     def get(request):
@@ -20,25 +21,28 @@ class Login():
             auth = firebase.auth()
             # Log the user in
             try:
-                user = auth.sign_in_with_email_and_password(correo, password)
-                user = auth.refresh(user['refreshToken'])
-                user_id = user['idToken']
+                    user = auth.sign_in_with_email_and_password(correo, password)
+                    user = auth.refresh(user['refreshToken'])
+                    user_id = user['idToken']
+                    
+                    db = firebase.database()
+                    user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
+                    clave = list(user_by_id)[0]
+                                      
+                   
+                    session['user'] = clave
+                    session['rol'] = user_by_id[clave]['rol']
+                    session['direccion'] = user_by_id[clave]['direccion']
 
-                db = firebase.database()
-                user_by_id = db.child("Usuarios").order_by_child("correo").equal_to(correo).get().val()
-                clave = list(user_by_id)[0]
+                    if session['rol'] == "restaurante":
+                        res = Restaurante().getRestauranteByCorreo(correo,firebase)
+                        res = list(res)[0]
+                        session['id_restaurante'] = res
+                    else:
+                        session['id_restaurante'] = None
+                        
+                    url[0] = 'wb.html'
 
-                session['user'] = clave
-                session['rol'] = user_by_id[clave]['rol']
-
-                if session['rol'] == "restaurante":
-                    res = Restaurante().getRestauranteByCorreo(correo, firebase)
-                    res = list(res)[0]
-                    session['id_restaurante'] = res
-                else:
-                    session['id_restaurante'] = None
-
-                url[0] = 'wb.html'
             except:
                 message = "Correo o password invalidos"
                 url[1] = message;
@@ -256,17 +260,18 @@ class AdminMenus():
 
 class misPedidos():
     @staticmethod
-    def getMisPedidos(user_id, estado):
+    def getMisPedidos(estado):
+        user_id = session['user']
         firebase = ConnectFirebase().firebase
         pedido = Pedido.getPedidos(user_id, firebase, estado)
         return pedido
-
+    '''
     @staticmethod
-    def getPedidosRestaurante(id_restaurante, estado):
+    def getPedidosRestaurante(id_restaurante):
         firebase = ConnectFirebase().firebase
-        pedido = Pedido.getPedidosRestaurante(id_restaurante, firebase, estado)
+        pedido = Pedido.getPedidosRestaurante(id_restaurante, firebase)
         return pedido
-
+    '''
     @staticmethod
     def deletePedido(id_pedido):
         firebase = ConnectFirebase().firebase
@@ -274,9 +279,26 @@ class misPedidos():
 
     def crearPedido(pedido, id_restaurante):
         user_id = session['user']
+        direccion = session['direccion']
         firebase = ConnectFirebase().firebase
-        Pedido().crearPedido(pedido, firebase, id_restaurante, user_id)
-
+        Pedido().crearPedido(pedido, firebase, id_restaurante, user_id, direccion)
+    def getPedidosRestaurante():
+        id_restaurante = session['user']
+        firebase = ConnectFirebase().firebase
+        return Pedido().getPedidosRestaurante(id_restaurante, firebase)
+    def actualizarEstadoPedido(id_pedido):
+        firebase = ConnectFirebase().firebase
+        Pedido().actualizarEstadoPedido(id_pedido, firebase)
+    def anadirPedidocesta(pedido):
+        firebase = ConnectFirebase().firebase
+        Pedido().anadirPedidocesta(pedido, firebase)
+    def getPedidosCesta():
+        firebase = ConnectFirebase().firebase
+        return Pedido().getPedidosCesta(firebase)
+    def borrarCesta():
+        firebase = ConnectFirebase().firebase
+        Pedido().borrarCesta(firebase)
+        
 
 class listarRestaurantes():
     @staticmethod
@@ -339,10 +361,10 @@ class usuario():
         firebase = ConnectFirebase().firebase
         return Usuario.consultarUsuario(id_user, firebase)
 
-    def getCoordDireccion(self):
+    def getCoordDireccion():
         user_id = session['user']
         firebase = ConnectFirebase().firebase
-        return Usuario.getCoordDireccion(user_id, firebase)
+        return Usuario().getCoordDireccion(user_id, firebase)
 class Imagen():
     def subirImagen(self,request,campo):
             f = request.files[campo];
