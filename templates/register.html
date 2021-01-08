@@ -48,6 +48,7 @@
 				<input type="hidden" name="nombre" id="nombre" value="{{session['nombre']}}">
 				<input type="hidden" name="correo" id="correo" value="{{session['correo']}}">
 				<input type="hidden" name="id" id="id" value="{{session['id']}}">
+				<input type="hidden" name="entorno" value="" id="varEntorno">
 	            <div class="d-flex justify-content-center" style="margin-top:20px">
 	              <input type="submit" value="Registrarse" class="btn btn-success">
 	            </div>
@@ -77,4 +78,5 @@
 	        {% if datos%}
               alert("Contraseña equivocada");
             {% endif %}
+            $("#varEntorno").val(window.location.hostname);
 {% endblock javascript%}

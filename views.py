@@ -97,7 +97,7 @@ class Registro():
                     if request.files['logoRestaurante'].filename == '':
                         urlFoto = "img/res_placeholder.jpg"
                     else:
-                        urlFoto = Imagen().subirImagen(request,'logoRestaurante')
+                        urlFoto = Imagen().subirImagen(request,'logoRestaurante',request.form['entorno'])
                 
                     data2 = {"Nombre": nombreRes, "correo": correo, "descripcion": descripcion,
                              "logo": urlFoto, "direccion": direccion, "telefono": telefono}
@@ -208,7 +208,7 @@ class AdminMenus():
                 id_res = request.form['idRestauranteValue']
   
             if request.files['fotoPlato'].filename != '':
-                urlFoto = Imagen().subirImagen(request,'fotoPlato')
+                urlFoto = Imagen().subirImagen(request,'fotoPlato',request.form['entorno'])
             else:
                 urlFoto = request.form["fotoActual"]
 
@@ -240,7 +240,7 @@ class AdminMenus():
             if request.files['fotoPlato'].filename == '':
                 urlFoto = "img/menu_placeholder2.jpg"
             else:
-                urlFoto = Imagen().subirImagen(request, 'fotoPlato')
+                urlFoto = Imagen().subirImagen(request, 'fotoPlato', request.form['entorno'])
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
@@ -366,12 +366,17 @@ class usuario():
         firebase = ConnectFirebase().firebase
         return Usuario().getCoordDireccion(user_id, firebase)
 class Imagen():
-    def subirImagen(self,request,campo):
+    def subirImagen(self,request,campo,entorno):
             f = request.files[campo];
             cliente = Flickr().autenticacionFlickr()
-            f.save('tmp_img/' +f.filename)
-            foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title=f.filename)
-            os.remove('tmp_img/' + f.filename)
+            if entorno =='localhost':
+                f.save('tmp_img/' +f.filename)
+                foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title=f.filename)
+                os.remove('tmp_img/' + f.filename)
+            else:
+                f.save('/tmp/' +f.filename)
+                foto = flickr_api.upload(photo_file='/tmp/' + f.filename, title=f.filename)
+                os.remove('/tmp/' + f.filename)
             url = self.getImagen(foto.id)
             return url
     def getImagen(self,id_foto):

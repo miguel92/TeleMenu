@@ -59,6 +59,7 @@
 			
             <div class="custom-file">
 	              		<label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
+	              		<input type="hidden" name="entorno" value="" id="varEntorno">
 					    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
 					    <div class="invalid-feedback">Example invalid custom file feedback</div>
 			</div>
@@ -71,3 +72,6 @@
 </div>
 
 {% endblock %}
+{% block javascript%}
+    $("#varEntorno").val(window.location.hostname);
+{% endblock javascript%}
