@@ -336,17 +336,9 @@ def listarMenu():
     return render_template('admin/listarMenus.html', datos=menus)
 
 
-@app.route('/listarMenusRestaurante/<id_user>')
-def listarMenusRestauranteUser(id_user):
-    if session['id'] != id_user:
-        return redirect(url_for('listarMenusRestaurante', id_user=session['id']))
-    # Obtener el usuario a partir de la id
-    user = usuario.get_usuario(id_user)
-    user_value = list(user.values())[0]
-    rest = listarRestaurantes.get_restaurante_by_correo(user_value['correo'])
-    rest_key = list(rest)[0]
-    menus = listarRestaurantes.getListaMenusRestaurante(rest_key)
-    session['id_restaurante'] = rest_key
+@app.route('/listarMenusRestaurante')
+def listarMenusRestauranteUser():
+    menus = listarRestaurantes.getListaMenusRestaurante(session['id_restaurante'])
     return render_template('admin/listarMenus.html', datos=menus)
 
 
@@ -363,7 +355,7 @@ def crearMenu():
     if datos[0] == "listarMenu.html":
         return redirect(url_for('listarMenu'))
     elif datos[0] == "listarMenusRestaurante.html":
-        return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
+        return redirect(url_for('listarMenusRestauranteUser'))
     else:
         return render_template(datos[0], datos=datos[1], datos2=listaRes)
 
@@ -375,7 +367,7 @@ def editarMenu(id_menu):
     listaRes = AdminRestaurantes.getLista()
     if datos is not None:
         if session['rol'] == 'restaurante':
-            return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
+            return redirect(url_for('listarMenusRestauranteUser'))
         return redirect(url_for('listarMenu'))
 
     return render_template('admin/editarMenu.html', datos=menus, datos2=listaRes)
@@ -385,7 +377,7 @@ def editarMenu(id_menu):
 def borrarMenu(id_menu):
     AdminMenus.delete(id_menu)
     if session['rol'] == 'restaurante':
-        return redirect(url_for('listarMenusRestaurante', id_user=session['user_id']))
+        return redirect(url_for('listarMenusRestauranteUser'))
     return redirect(url_for('listarMenus'))
 
 
@@ -543,6 +535,10 @@ def callback():
     session['rol'] = user_by_id[clave]['rol']
     session['user'] = users_email
     session['direccion'] = user_by_id[clave]['direccion']
+    if session['rol'] == 'restaurante':
+        rest = listarRestaurantes.get_restaurante_by_correo(session['correo'])
+        rest_key = list(rest)[0]
+        session['id_restaurante'] = rest_key
     user = Usuario(
         id_=unique_id, name=users_name, email=users_email, rol=user_by_id[clave]['rol']
     )

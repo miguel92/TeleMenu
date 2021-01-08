@@ -94,7 +94,7 @@ class Registro():
                     descripcion = request.form['descripcion']
                     nombreRes = request.form['nombreRestaurante']
 
-                    if request.files['logoRestaurante'] is None:
+                    if request.files['logoRestaurante'].filename == '':
                         urlFoto = "img/res_placeholder.jpg"
                     else:
                         urlFoto = Imagen().subirImagen(request,'logoRestaurante')
@@ -165,7 +165,7 @@ class AdminRestaurantes():
             direccion = request.form['direccion']
             telefono = request.form['telefono']
 
-            if request.files['logoRestaurante'] is None:
+            if request.files['logoRestaurante'].filename == '':
                 urlFoto = "img/res_placeholder.jpg"
             else:
                 urlFoto = Imagen().subirImagen(request.files['logoRestaurante'])
@@ -202,15 +202,15 @@ class AdminMenus():
 
             # FOTO DEL PLATO PARTE DE HAMZA
 
-            if session['id_restaurante']:
+            if session.get('id_restaurante'):
                 id_res = session['id_restaurante']
             else:
-                id_res = request.form['idRestaurante']
-
-            if request.files['fotoPlato'] is None:
-                urlFoto = "img/menu_placeholder2.jpg"
-            else:
+                id_res = request.form['idRestauranteValue']
+  
+            if request.files['fotoPlato'].filename != '':
                 urlFoto = Imagen().subirImagen(request,'fotoPlato')
+            else:
+                urlFoto = request.form["fotoActual"]
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
@@ -237,7 +237,7 @@ class AdminMenus():
             else:
                 id_res = request.form['idRestaurante']
 
-            if request.files['fotoPlato'] is None:
+            if request.files['fotoPlato'].filename == '':
                 urlFoto = "img/menu_placeholder2.jpg"
             else:
                 urlFoto = Imagen().subirImagen(request, 'fotoPlato')
@@ -369,9 +369,9 @@ class Imagen():
     def subirImagen(self,request,campo):
             f = request.files[campo];
             cliente = Flickr().autenticacionFlickr()
-            f.save('tmp_img/'+f.filename)
+            f.save('tmp_img/' +f.filename)
             foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title=f.filename)
-            os.remove('tmp_img/'+f.filename)
+            os.remove('tmp_img/' + f.filename)
             url = self.getImagen(foto.id)
             return url
     def getImagen(self,id_foto):

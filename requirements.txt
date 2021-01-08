@@ -46,3 +46,4 @@ oauthlib==3.0.1
 pyOpenSSL==19.0.0
 Flask-Login==0.4.1
 flickr_api
+jedi<=0.17.2
