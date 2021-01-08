@@ -90,10 +90,13 @@ class Registro():
                     descripcion = request.form['descripcion']
                     nombreRes = request.form['nombreRestaurante']
 
-                    # AQUI VA LA PARTE DEL LOGO -> HAMZA
-
+                    if request.files['logoRestaurante'] is None:
+                        urlFoto = "img/res_placeholder.jpg"
+                    else:
+                        urlFoto = Imagen().subirImagen(request,'logoRestaurante')
+                
                     data2 = {"Nombre": nombreRes, "correo": correo, "descripcion": descripcion,
-                             "logo": "urlPlaceholder", "direccion": direccion, "telefono": telefono}
+                             "logo": urlFoto, "direccion": direccion, "telefono": telefono}
                     Restaurante.crearRestaurante(data2, firebase)
 
                 Usuario.crearUsuario(data, firebase)
@@ -156,13 +159,15 @@ class AdminRestaurantes():
             correo = request.form['correo']
             descripcion = request.form['descripcion']
             direccion = request.form['direccion']
-            # logo = request.form['logo']
             telefono = request.form['telefono']
 
-            # data = {"Nombre": Nombre, "correo": correo, descripcion: "descripcion",
-            #        "direccion": direccion, "logo": logo, "telefono": telefono}
+            if request.files['logoRestaurante'] is None:
+                urlFoto = "img/res_placeholder.jpg"
+            else:
+                urlFoto = Imagen().subirImagen(request.files['logoRestaurante'])
+                
             data = {"Nombre": Nombre, "correo": correo, descripcion: "descripcion",
-                    "direccion": direccion, "telefono": telefono}
+                    "direccion": direccion, "telefono": telefono, "logo": urlFoto}
             datos = Restaurante.update_restaurante(id_restaurante, data, firebase)
             return datos
 
@@ -198,13 +203,14 @@ class AdminMenus():
             else:
                 id_res = request.form['idRestaurante']
 
-            if request.form['fotoPlato'] is None:
+            if request.files['fotoPlato'] is None:
                 urlFoto = "img/menu_placeholder2.jpg"
             else:
-                urlFoto = request.form['fotoPlato']
+                urlFoto = Imagen().subirImagen(request,'fotoPlato')
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
+            print(data)
             datos = Menu().updateMenu(id_menu, data, firebase)
             return datos
 
@@ -222,21 +228,19 @@ class AdminMenus():
             ingredientes = request.form['ingredientes']
             tipoPlato = request.form['tipoPlato']
 
-            # FOTO DEL PLATO PARTE DE HAMZA
-
             if session['id_restaurante']:
                 id_res = session['id_restaurante']
             else:
                 id_res = request.form['idRestaurante']
 
-            if request.form['fotoPlato'] == "":
+            if request.files['fotoPlato'] is None:
                 urlFoto = "img/menu_placeholder2.jpg"
             else:
-                urlFoto = request.form['fotoPlato']
+                urlFoto = Imagen().subirImagen(request, 'fotoPlato')
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
-
+            
             try:
                 Menu().createMenu(data, firebase)
                 if session['rol'] == 'restaurante':
@@ -340,44 +344,42 @@ class usuario():
         firebase = ConnectFirebase().firebase
         return Usuario.getCoordDireccion(user_id, firebase)
 class Imagen():
-    def subirImagen(self,request):
-        if request.method == 'POST':
+    def subirImagen(self,request,campo):
+            f = request.files[campo];
             cliente = Flickr().autenticacionFlickr()
-            f = request.files['fotoPlato']
             f.save('tmp_img/'+f.filename)
-            foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title="My title")
+            foto = flickr_api.upload(photo_file='tmp_img/' + f.filename, title=f.filename)
             os.remove('tmp_img/'+f.filename)
-            photosets = cliente.getPhotosets()
-            print(photosets[0])
-            photosets[0].addPhoto(photo = foto)
+            url = self.getImagen(foto.id)
+            return url
     def getImagen(self,id_foto):
             api_key = 'ad53b2717df3f7c91bddf3e9a38ecc29'
             user_id = "191734611@N08"
-            photoset_id = "72157717756668921"
-            url = self.get_requestURL(user_id,api_key,endpoint="getList") 
+             
+            url = self.get_requestURL_people(user_id,api_key,endpoint="getPhotos")
             strlist = requests.get(url).content
             json_data = json.loads(strlist)
-            albums = json_data["photosets"]["photoset"]
-            url = self.get_requestURL(user_id,api_key,endpoint="getPhotos") + "&photoset_id=" + photoset_id
-            strlist = requests.get(url).content
-            json1_data = json.loads(strlist) 
+            
             url = None
             encontrado = False;
             contador = 0;
-            while (contador < len(json1_data["photoset"]["photo"])) and (encontrado == False):
-                pic = json1_data["photoset"]["photo"][contador]
+            
+            while (contador < len(json_data["photos"]["photo"])) and (encontrado == False):
+                pic = json_data["photos"]["photo"][contador]
+                print(pic['id'])
                 if pic["id"] == id_foto :
                     url = self.get_photo_url(pic["farm"],pic['server'], pic["id"], pic["secret"])
                     encontrado = True
                 contador = contador +1
+               
             return url 
     def get_photo_url(self,farmId,serverId,Id,secret):
         return (("https://farm" + str(farmId) + 
                 ".staticflickr.com/" + serverId + 
                 "/" + Id + '_' + secret + ".jpg"))
-    def get_requestURL(self,user_id,api_key,endpoint="getList"):
+    def get_requestURL_people(self,user_id,api_key,endpoint="getPhotos"):
         user_id = user_id.replace("@","%40")
-        url_upto_apikey = ("https://api.flickr.com/services/rest/?method=flickr.photosets." + 
+        url_upto_apikey = ("https://api.flickr.com/services/rest/?method=flickr.people." + 
                            endpoint + 
                            "&api_key=" +  api_key +  
                            "&user_id=" +  user_id +

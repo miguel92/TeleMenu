@@ -51,9 +51,7 @@
   color: white;
 }
 
-.centrar_imagen{
-	margin: 18px auto;
-    display: block;
-    width:200px;
-    height:120px;
+.imagen_menu{
+    max-height:180px;
+    margin:20px auto;
 }

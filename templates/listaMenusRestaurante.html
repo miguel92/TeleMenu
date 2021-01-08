@@ -27,22 +27,34 @@
                 <h3>Menus disponibles</h3>
                 {% for key, value in datos.items() %}
                     <div class="row">
-                        <ul class="list-group">
+                        <div class="list-group">
                             <a href="#1" class="list-group-item">
                                 <div>
                                     <h4>{{ value['Nombre'] }}</h4>
-                                    {% set src = url_for('static', filename='') + value["Foto"] %}
-                                    <img class="centrar_imagen" src="{{ src }}">
+                                    <div class="row">
+                                      <div class="col-md-2"></div>
+                                      <div class="col-md-8">
+		                                {% if value["Foto"] == "img/menu_placeholder2.jpg" %}
+					                    	{% set src = url_for('static', filename='') + value["Foto"] %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ '../'+src }}">
+					                    {% else %}
+					                    	{% set src = value["Foto"] %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ src }}">
+					                    {% endif %}
+					                    <div class="col-md-2"></div>
+					                    </div>
+                                    </div>
+
                                 </div>
 
                                 <p><i>{{ value['Ingredientes'] }}</i></p>
                                 <p><strong>Precio:</strong> {{ value['Precio'] }} </p>
 
-                                <p align="right"><input type="button" value="A&ntilde;adir al pedido"
-                                                        class="btn btn-success"
-                                                        onclick="agregarPedido('{{ value['Nombre'] }}')"/></p>
+                                <p align="right">
+                                	<input type="button" value="A&ntilde;adir al pedido" class="btn btn-success" onclick="agregarPedido('{{ value['Nombre'] }}')"/>
+                                </p>
                             </a>
-                        </ul>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
