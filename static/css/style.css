@@ -121,3 +121,13 @@ color:black;
 .stars-80:after { width: 80%; }
 .stars-90:after { width: 90%; }
 .stars-100:after { width: 100; }
+
+.icono-perfil{
+	border-radius:20px;
+	width:25px;
+	height:25px;
+	margin-right:10px;
+}
+.desplegable a {
+	color: black !important;
+}

@@ -523,6 +523,7 @@ def callback():
     session['nombre'] = users_name
     session['id'] = unique_id
     session['correo'] = users_email
+    session['picture'] = picture
 
 
     if user_by_id == []:
