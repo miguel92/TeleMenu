@@ -168,9 +168,9 @@ class AdminRestaurantes():
             if request.files['logoRestaurante'].filename == '':
                 urlFoto = "img/res_placeholder.jpg"
             else:
-                urlFoto = Imagen().subirImagen(request.files['logoRestaurante'])
+                urlFoto = Imagen().subirImagen(request,'logoRestaurante',request.form['entorno'])
                 
-            data = {"Nombre": Nombre, "correo": correo, descripcion: "descripcion",
+            data = {"Nombre": Nombre, "correo": correo, "descripcion": descripcion,
                     "direccion": direccion, "telefono": telefono, "logo": urlFoto}
             datos = Restaurante.update_restaurante(id_restaurante, data, firebase)
             return datos
