@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
+from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante, ComentarioModelo
 import firebase,os
 from auth_img import Flickr
 import flickr_api, requests,json
@@ -214,7 +214,6 @@ class AdminMenus():
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
-            print(data)
             datos = Menu().updateMenu(id_menu, data, firebase)
             return datos
 
@@ -412,3 +411,36 @@ class Imagen():
                            "&user_id=" +  user_id +
                            "&format=json&nojsoncallback=1")
         return(url_upto_apikey)        
+
+class Comentario():
+    def crearComentario(self, request, id_restaurante):
+        firebase = ConnectFirebase().firebase
+        url = ['crearMenu.html', None]
+
+        if request.method == 'POST':
+            comentario = request.form['text']
+            clasificacion = request.form['contadorEstrellas']
+
+            user_id = session['id']
+            correo = session['user']
+
+            if request.files['fotoComentario'].filename == '':
+                urlFoto = "img/menu_placeholder2.jpg"
+            else:
+                urlFoto = Imagen().subirImagen(request, 'fotoComentario', request.form['entorno'])
+
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Restaurante": id_restaurante, "Texto": comentario, "Usuario": user_id, "Correo": correo}
+            
+            try:            
+                ComentarioModelo().crearComentario(data, firebase)
+                url[0] = 'comentarioRealizado.html'
+            except:
+                message = "No se ha podido crear"
+                url[1] = message
+        return url
+    def getValoracionMedia(id_restaurante):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getValoracionMedia(id_restaurante, firebase)
+    def getComentarios(self, id_restaurante):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getComentarios(id_restaurante, firebase)

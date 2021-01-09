@@ -14,7 +14,7 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario,Imagen
+from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario,Imagen, Comentario
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import ConnectFirebase, Pedido, Usuario
 import folium
@@ -215,14 +215,15 @@ def listarMenusRestauranteWeb(id_restaurante):
     restaurante = listarRestaurantes.get_restaurante(id_restaurante)
     menus = listarRestaurantes.getListaMenusRestaurante(id_restaurante)
     tiempo = listarRestaurantes.get_weather_pollution_for_restaurante(restaurante)
+    mediaValoracion = Comentario.getValoracionMedia(id_restaurante)
     if len(menus) > 0:
         pedido = request.get_json()
         if (pedido is not None):
             misPedidos.anadirPedidocesta(pedido)
         
-        return render_template('listaMenusRestaurante.html', datos=menus,id_restaurante=id_restaurante, restaurante=restaurante, tiempo=tiempo)
+        return render_template('listaMenusRestaurante.html', datos=menus,id_restaurante=id_restaurante, restaurante=restaurante, tiempo=tiempo, mediaValoracion= mediaValoracion)
     else:
-        return render_template('listaMenusRestaurante.html', datos=None, id_restaurante=id_restaurante,restaurante=restaurante, tiempo=tiempo)
+        return render_template('listaMenusRestaurante.html', datos=None, id_restaurante=id_restaurante,restaurante=restaurante, tiempo=tiempo, mediaValoracion= mediaValoracion)
     
  
 @app.route("/cestaPedido", methods=["GET", "POST"])
@@ -575,11 +576,17 @@ def testimg():
 def comentarPedido(id_restaurante):
     restaurante = listarRestaurantes.get_restaurante(id_restaurante)
     nombreRestaurante = restaurante['Nombre']
-    datos = AdminMenus().create(request)
-    listaRes = AdminRestaurantes.getLista()
-    return render_template('crearComentario.html', nombreRestaurante = nombreRestaurante)
+    datos = Comentario().crearComentario(request, id_restaurante)
+    if (datos[0] == 'comentarioRealizado.html'):
+        return render_template('comentarioRealizado.html')
+    else:
+        return render_template('crearComentario.html', nombreRestaurante = nombreRestaurante)
 
-
+@app.route('/todosComentarios/<id_restaurante>', methods=["GET", "POST"])
+def todosComentarios(id_restaurante):
+    comentarios = Comentario().getComentarios(id_restaurante)
+    restaurante = listarRestaurantes.get_restaurante(id_restaurante)
+    return render_template('todosComentarios.html', datos=comentarios, nombre=restaurante['Nombre'])
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

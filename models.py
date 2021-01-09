@@ -331,3 +331,22 @@ class Restaurante():
     def __obtain_pollution_air_quality(aqi):
         descripcion = ['Buena', 'Razonable', 'Moderada', 'Mala', 'Muy mala']
         return descripcion[aqi - 1]
+
+class ComentarioModelo():
+    def crearComentario(self, data, firebase):
+        db = firebase.database()
+        db.child("Valoraciones").push(data)
+    def getValoracionMedia(self, id_restaurante, firebase):
+        db = firebase.database()
+        valoraciones = db.child("Valoraciones").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
+        media=0.0
+        total=len(valoraciones)
+        if valoraciones:
+            for key, value in valoraciones.items():
+                media = media + float(value['Clasificacion'])
+            media = media/total
+        return media
+    def getComentarios(self, id_restaurante, firebase):
+        db = firebase.database()
+        comentarios = db.child("Valoraciones").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
+        return comentarios

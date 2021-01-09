@@ -17,6 +17,21 @@
                 <h4>Polución</h4>
                 <p>Calidad del aire: {{ tiempo['pollution']['air_quality'] }}</p>
             {% endif %}
+            {% if datos %}
+					{% if mediaValoracion == 0.0%}
+					<div style="border: 2px solid gray; padding: 10px;">
+						<p id="haPedido" style="visibility: visible;">A&uacute;n no hay valoraciones. </p>
+					</div>
+					{% else %}
+					<div style="border: 2px solid gray; padding: 10px;">
+						<p id="fixture" style="visibility: visible;">Valoraci&oacute;n media: <div id="fixture" style="size:50"></div>
+							
+						</p>
+	                    <p align="left"><a href="/todosComentarios/{{id_restaurante}}"><input href="/todosComentarios" type="button" value="Ver todos los comentarios"
+	                                       class="btn btn-success"/></p>
+	                </div>
+					{% endif %}
+			{% endif %}
         </div>
         {% if datos == None %}
             <div class="col-sm-6">
@@ -92,29 +107,16 @@
 {% endblock %}
 
 {% block javascript %}
-pedido = {}
-function agregarPedido(nombre, precio){	
-	pedido['Nombre']=nombre;
-	pedido['Precio']=precio;
-	
-	pedido['Restaurante']='{{id_restaurante}}'
-	id_restaurante = '{{id_restaurante}}'
-	
-	$('.error').fadeIn(400).delay(3000).fadeOut(400); //fade out after 3 seconds
-	$.ajax({
-          type: "POST",
-          url: "../listarMenusRestauranteWeb/" + id_restaurante,
-          contentType: "application/json;charset=utf-8",
-          data: JSON.stringify({pedido}),
-          dataType: "json",
-          success: function(data, textStatus){
-        	  console.log("sdsad");
-        	  if (data.redirect){
-        		  
-        		  window.location.href = data.redirect;
-        	  }
-          }
-          });
-	
-}
-{% endblock javascript %}
+	$(function() {
+	  function addScore(score, $domElement) {
+	    $("<span class='stars-container'>")
+	      .addClass("stars-" + score.toString())
+	      .text("★★★★★")
+	      .appendTo($domElement);
+	  }
+	  media = {{mediaValoracion}} * 100/5;
+	  mediaRound = Math.ceil(media / 10) * 10;
+	  console.log(mediaRound);
+	  addScore(mediaRound, $("#fixture"));
+	});
+{% endblock javascript%}
