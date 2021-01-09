@@ -124,6 +124,7 @@ def pedidosRestaurante():
     direccion=""
     id_pedido=""
     cont=0
+    hora= ""
     for key in pedidos:
         id_pedido=key
         for key2 in pedidos[key]:

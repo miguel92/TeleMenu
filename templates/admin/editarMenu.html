@@ -73,11 +73,15 @@
 					                    <div class="col-md-2"></div>
 					                    </div>
                                     </div>
-                    <label class="custom-file-label" for="fotoPlato">Foto del Plato</label>
-                    <input type="hidden" name="fotoActual" value="{{value["Foto"]}}">
-                    <input type="hidden" name="entorno" value="" id="varEntorno">
-                    <input type="file" id="fotoPlato" name="fotoPlato" class="custom-file-input" id="logoRestaurante">
-                    <div class="invalid-feedback">Example invalid custom file feedback</div>
+                    
+                    <div class="form-group">
+	              		<label class="control-label col-sm-3" for="fotoPlato">Foto del Plato</label>
+	              		<div class="col-sm-6">
+	              		<input type="hidden" name="fotoActual" value="{{value["Foto"]}}">
+	              		<input type="hidden" name="entorno" value="" id="varEntorno">
+					    <input type="file" name="fotoPlato" class="custom-file-input" id="fotoPlato">
+					    </div>
+			</div>
                 </div>
 
                 <div class="form-group text-center">

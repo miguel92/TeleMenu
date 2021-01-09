@@ -8,13 +8,13 @@
             <div class="form-group">
                 <label for="nombrePlato" class="col-sm-3 control-label">Restaurante</label>
                 <div class="col-sm-6">
-                    <input type="text" class="form-control" name="nombrePlato" id="nombrePlato" value="{{nombreRestaurante}}" readonly>
+                    <span class="form-control-text">{{nombreRestaurante}}</span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="ingredientes" class="col-sm-3 control-label">Comentario</label>
                 <div class="col-sm-6">
-			         <textarea rows="5" cols="60" name="text" placeholder=" Comentario "></textarea>
+			         <textarea  style="resize:none;" rows="5" cols="64" name="text" placeholder=" Comentario "></textarea>
       				<br/>
                 </div>
             </div>
@@ -23,21 +23,24 @@
                 <label for="ingredientes" class="col-sm-3 control-label">Valoraci&oacute;n</label>
                 <div class="col-sm-6">
 			        <div >
-						<span class="fa fa-star" onclick="calificar(this)" style="cursor:pointer" id="1estrella"></span>
-						<span class="fa fa-star" onclick="calificar(this)" style="cursor:pointer" id="2estrella"></span>
-						<span class="fa fa-star" onclick="calificar(this)" style="cursor:pointer" id="3estrella"></span>
-						<span class="fa fa-star" onclick="calificar(this)" style="cursor:pointer" id="4estrella"></span>
-						<span class="fa fa-star" onclick="calificar(this)" style="cursor:pointer" id="5estrella"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="1"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="2"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="3"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="4"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="5"></span>
 						<input type="hidden" name="contadorEstrellas" value="" id="contEstrellas">
 			        </div>
 			    </div>
             </div>
-            <div class="custom-file">
-	              		<label class="custom-file-label" for="fotoPlato">Puede a&ntilde;adir una imagen al comentario.</label>
-	              		<input type="hidden" name="entorno" value="" id="varEntorno">
-					    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
-					    <div class="invalid-feedback">Example invalid custom file feedback</div>
-			</div>
+	            <div class="form-group">
+		              		<label class="control-label col-sm-3" for="fotoPlato">Imagen al comentario</label>
+		              		<div class="col-sm-6">
+		              		<input type="hidden" name="entorno" value="" id="varEntorno">
+						    <input type="file" name="fotoPlato" class="custom-file-input" id="logoRestaurante" >
+						    </div> 		
+				</div>
+            
+            
             <div class="form-group text-center">
                 <button type="submit" value="submit" class="btn btn-warning">Enviar</button>
                 <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
@@ -46,39 +49,16 @@
     </div>
 </div>
 
-<script>
-	var contador;
-	function calificar(item){
-		contador = item.id[0];
-		let nombre = item.id.substring(1);
-		
-		for (let i=0; i<5; i++){
-			if (i<contador){
-				document.getElementById((i+1)+nombre).style.color="orange";
-			}else {
-				document.getElementById((i+1)+nombre).style.color="black";
-			}
-		}
-		
-	}
-
-</script>
-
 {% endblock %}
 {% block javascript%}
 	$("#varEntorno").val(window.location.hostname);
 	var contador;
-	$(".fa fa-star").click(function(){
-		contador = $(this).id[0];
-		let nombre = $(this).id.substring(1);
-		
-		for (let i=0; i<5; i++){
-			if (i<contador){
-				document.getElementById((i+1)+nombre).style.color="orange";
-			}else {
-				document.getElementById((i+1)+nombre).style.color="black";
-			}
+	$(".estrella").click(function(){
+		contador = $(this).attr("data-star");
+		$(".estrella").removeClass("checked");
+		for(var i = 0; i <= contador; i++){
+			$("span[data-star='"+i+"']").addClass("checked");
 		}
+		$("#contEstrellas").val(contador);
 	});
-	$("#contEstrellas").val(contador);
 {% endblock javascript%}

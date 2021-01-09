@@ -19,29 +19,30 @@
 					  <p style="font-style:italic">Si lo que buscas es poder servir los men&uacute;s de tu restaurante, administrar los pedidos y valoraciones , &iexcl;esta es la opci&oacute;n que tienes que elegir&excl;</p>
 					  </div>
 				  </div>              
-	              <div>
+	              <div >
 	                <label data-error="wrong" data-success="right" for="direccion">Direcci&oacute;n</label>
 	                <input type="text" name="direccion" id="direccion" class="form-control validate">
 	              </div>
 	              
-	              <div>
+	              <div style="margin-top:20px">
 	                <label data-error="wrong" data-success="right" for="telefono">Tel&eacute;fono</label>
 	                <input type="phone" name="telefono" id="telefono" class="form-control validate">
 	              </div>
 	              
-	              <div id="datosRestaurante" style="display:none">
-		              <div>
+	              <div id="datosRestaurante" style="display:none" >
+		              <div style="margin-top:20px">
 		                <label data-error="wrong" data-success="right" for="nombreRestaurante">Nombre Restaurante</label>
 		                <input type="text" name="nombreRestaurante" id="nombreRestaurante" class="form-control validate">
 		              </div>
-	                <div>
+	                <div style="margin-top:20px">
 		                <label data-error="wrong" data-success="right" for="descripcion">Descripci&oacute;n</label>
 		                <textarea class="form-control validate" style="resize:none;" rows="5" id="descripcion" name="descripcion"></textarea>
 	              	</div>
-	              	<div class="custom-file">
-	              		<label class="custom-file-label" for="logoRestaurante">Logo del restaurante</label>
-					    <input type="file" name="logoRestaurante" class="custom-file-input" id="logoRestaurante" >
-					    <div class="invalid-feedback">Example invalid custom file feedback</div>
+	              	<div class="form-group" style="margin-top:20px">
+	              		<label class="control-label col-sm-12" for="logoRestaurante">Logo del restaurante</label>
+	              		<div class="col-sm-12">
+					    <input style="margin: 0 auto;" type="file" name="logoRestaurante" class="custom-file-input" id="logoRestaurante" >
+					    </div>
 					  </div>
 	              </div>
 
@@ -49,8 +50,8 @@
 				<input type="hidden" name="correo" id="correo" value="{{session['correo']}}">
 				<input type="hidden" name="id" id="id" value="{{session['id']}}">
 				<input type="hidden" name="entorno" value="" id="varEntorno">
-	            <div class="d-flex justify-content-center" style="margin-top:20px">
-	              <input type="submit" value="Registrarse" class="btn btn-success">
+	            <div class="d-flex justify-content-center" >
+	              <input style="margin-top:20px" type="submit" value="Registrarse" class="btn btn-success">
 	            </div>
 	
 	        </form>
