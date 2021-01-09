@@ -55,3 +55,12 @@
     max-height:180px;
     margin:20px auto;
 }
+
+.checked
+{
+color:orange;
+}
+.unchecked
+{
+color:white;
+}

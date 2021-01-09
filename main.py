@@ -569,6 +569,16 @@ def testimg():
     url = Imagen().getImagen("50807667338")
     Imagen().subirImagen(request);
     return render_template('testimg.html', datos = url)
+
+@app.route('/comentarPedido/<id_restaurante>', methods=["GET", "POST"])
+def comentarPedido(id_restaurante):
+    restaurante = listarRestaurantes.get_restaurante(id_restaurante)
+    nombreRestaurante = restaurante['Nombre']
+    datos = AdminMenus().create(request)
+    listaRes = AdminRestaurantes.getLista()
+    return render_template('crearComentario.html', nombreRestaurante = nombreRestaurante)
+
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This
