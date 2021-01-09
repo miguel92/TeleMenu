@@ -18,7 +18,7 @@
 		  <li class="active"><a href="/editarRestauranteR/{{ session['user_id'] }}">Datos Restaurante</a></li>
 		</ul>
 		{% endif %}
-            <form class="form-horizontal" role="form" action="" method="post">
+            <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="inputNombreRestaurante" class="col-sm-3 control-label">Nombre</label>
                     <div class="col-sm-6">
@@ -54,16 +54,28 @@
                                placeholder=Tel&eacute;fono required="true" value="{{ datos['telefono'] }}">
                     </div>
                 </div>
+                  <div class="row">
+                                      <div class="col-md-2"></div>
+                                      <div class="col-md-8">
+		                                {% if datos['logo'] == "img/res_placeholder.jpg" %}
+					                    	{% set src = url_for('static', filename='') + datos['logo']  %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ '../'+src }}">
+					                    {% else %}
+					                    	{% set src = datos['logo']  %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ src }}">
+					                    {% endif %}
+					                    <div class="col-md-2"></div>
+					                    </div>
+                                    </div>
+                
                 <div class="custom-file">
-                    {% if datos['logo'] != "urlPlaceholder" %}
-                        {% set src = url_for('static', filename='') + datos['logo'] %}
-                        <img class="centrar_imagen" src="{{ src }}"/>
-                    {% else %}
-                        <img class="centrar_imagen" src="../static/img/padthai.jpg"/>
-                    {% endif %}
+                  
+                    
                     <label class="custom-file-label" for="logoRestaurante">Logo del restaurante</label>
                     <input type="file" name="logoRestaurante" class="custom-file-input" id="logoRestaurante"
                            value="{{ datos['logo'] }}">
+                    <input type="hidden" name="fotoActual" value="{{datos['logo']}}">
+                    <input type="hidden" name="entorno" value="" id="varEntorno">
                     <div class="invalid-feedback">Example invalid custom file feedback</div>
                 </div>
 
@@ -75,3 +87,7 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascript%}
+    $("#varEntorno").val(window.location.hostname);
+{% endblock javascript%}
