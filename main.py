@@ -586,7 +586,7 @@ def comentarPedido(id_restaurante):
 def todosComentarios(id_restaurante):
     comentarios = Comentario().getComentarios(id_restaurante)
     restaurante = listarRestaurantes.get_restaurante(id_restaurante)
-    return render_template('todosComentarios.html', datos=comentarios, nombre=restaurante['Nombre'])
+    return render_template('todosComentarios.html', datos=comentarios, nombre=restaurante['Nombre'], longitud = len(comentarios))
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This
