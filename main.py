@@ -14,7 +14,7 @@
 
 # [START gae_python38_render_template]
 import datetime
-from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario,Imagen, Comentario
+from views import Login, Registro, AdminMenus, misPedidos, listarRestaurantes, AdminUsuarios, AdminRestaurantes, usuario,Imagen, Comentario, AdminValoraciones
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import ConnectFirebase, Pedido, Usuario
 import folium
@@ -94,6 +94,7 @@ def mapaRestaurantesCercanos():
 def pedidosCliente():
     pedidosPendientes = misPedidos.getMisPedidos("Pendiente")
     pedidosTerminados = misPedidos.getMisPedidos("Terminado")
+    print(pedidosTerminados)
     if len(pedidosPendientes) > 0 and len(pedidosTerminados) >0:
         return render_template('pedidos.html', datos=pedidosPendientes, datos2=pedidosTerminados)
     elif len(pedidosPendientes) > 0 and len(pedidosTerminados) ==0:
@@ -588,6 +589,26 @@ def todosComentarios(id_restaurante):
     comentarios = Comentario().getComentarios(id_restaurante)
     restaurante = listarRestaurantes.get_restaurante(id_restaurante)
     return render_template('todosComentarios.html', datos=comentarios, nombre=restaurante['Nombre'], longitud = len(comentarios))
+
+@app.route('/listarValoraciones')
+def listarValoraciones():
+    datos = AdminValoraciones.getListaValoraciones()
+    return render_template('admin/listarValoraciones.html', datos=datos)
+
+@app.route('/editarValoracion/<id_valoracion>', methods=["GET", "POST"])
+def editarValoracion(id_valoracion):
+    valoracion = AdminValoraciones.get(id_valoracion)
+    datos = AdminValoraciones.update(request, id_valoracion)
+    if datos == 'True':
+        return redirect(url_for("listarValoraciones"))
+        
+    listaVal = AdminValoraciones.getListaValoraciones()
+    return render_template('admin/editarValoracion.html', datos=valoracion, datos2=listaVal, id_valoracion = id_valoracion)
+
+@app.route('/borrarValoracion/<id_valoracion>', methods=["GET", "POST"])
+def borrarValoracion(id_valoracion):
+    AdminValoraciones.delete(id_valoracion)
+    return redirect(url_for('listarValoraciones'))
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

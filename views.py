@@ -444,3 +444,46 @@ class Comentario():
     def getComentarios(self, id_restaurante):
         firebase = ConnectFirebase().firebase
         return ComentarioModelo().getComentarios(id_restaurante, firebase)
+    
+class AdminValoraciones():
+    @staticmethod
+    def getListaValoraciones():
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getAllComentarios(firebase)
+
+    def get(id_valoracion):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getValoracion(id_valoracion, firebase)
+
+    def update(request, id_valoracion):
+        firebase = ConnectFirebase().firebase
+        url = ['admin/editarValoracion.html', "defecto"]
+
+        if request.method == 'POST':
+            comentario = request.form['text']
+            clasificacion = request.form['contadorEstrellas']
+
+            user_id = session['id']
+            correo = session['user']
+
+            if request.files['fotoComentario'].filename == '':
+                urlFoto = "img/menu_placeholder2.jpg"
+            else:
+                urlFoto = Imagen().subirImagen(request, 'fotoComentario', request.form['entorno'])
+
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Texto": comentario, "Usuario": user_id, "Correo": correo}
+            
+            try:            
+                update = ComentarioModelo().updateComentario(id_valoracion, data, firebase)
+                if (update == data):
+                    url[0] = 'True'
+                else:
+                    url[0] = 'False'
+            except:
+                message = "No se ha podido crear"
+                url[1] = message
+        return url
+
+    def delete(id_valoracion):
+        firebase = ConnectFirebase().firebase
+        ComentarioModelo().deleteValoracion(id_valoracion, firebase)

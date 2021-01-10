@@ -80,6 +80,11 @@ class Usuario(UserMixin):
             id_=user[clave]['user_id'], name=user[clave]['Nombre'], email=user[clave]['correo'], rol=user[clave]['rol']
         )
         return user
+    def getNombreById(user_id):
+        firebase = ConnectFirebase().firebase
+        db = firebase.database()
+        user = db.child("Usuarios").order_by_child("user_id").equal_to(user_id).get().val()
+        return user
 
 
 class Menu():
@@ -118,6 +123,8 @@ class Pedido():
         if len(pedidos) > 0:
             for key, value in pedidos.items():
                 if (value['Estado'] == estado):
+                    restaurante = Restaurante.get_restaurante(value['Restaurante'], firebase)
+                    value['NombreRestaurante'] = restaurante['Nombre']
                     pedidosEstado[key] = value
         
         return pedidosEstado
@@ -335,6 +342,7 @@ class Restaurante():
 class ComentarioModelo():
     def crearComentario(self, data, firebase):
         db = firebase.database()
+        data['Fecha'] = now = time.strftime("%d/%m/%y")
         db.child("Valoraciones").push(data)
     def getValoracionMedia(self, id_restaurante, firebase):
         db = firebase.database()
@@ -350,3 +358,25 @@ class ComentarioModelo():
         db = firebase.database()
         comentarios = db.child("Valoraciones").order_by_child("Restaurante").equal_to(id_restaurante).get().val()
         return comentarios
+    def getAllComentarios(self, firebase):
+        db = firebase.database()
+        comentarios = db.child("Valoraciones").get().val()
+        for key in comentarios:
+            usuario = Usuario.getNombreById(comentarios[key]['Usuario'])
+            nombre = list(usuario.values())[0]['Nombre']
+            comentarios[key]['Nombre'] = nombre
+            restaurante = Restaurante.get_restaurante(comentarios[key]['Restaurante'],firebase)
+            comentarios[key]['NombreRestaurante'] = restaurante['Nombre']
+        return comentarios
+    def getValoracion(self, id_valoracion, firebase):
+        db = firebase.database()
+        valoracion = db.child("Valoraciones").order_by_key().equal_to(id_valoracion).get().val()
+        restaurante = Restaurante.get_restaurante(valoracion[id_valoracion]['Restaurante'],firebase)
+        valoracion[id_valoracion]['NombreRestaurante'] = restaurante['Nombre']
+        return valoracion
+    def updateComentario(self, id_valoracion, data, firebase):
+        db = firebase.database()
+        return db.child("Valoraciones").child(id_valoracion).update(data)
+    def deleteValoracion(self, id_valoracion, firebase):
+        db = firebase.database()
+        db.child("Valoraciones").child(id_valoracion).remove()
