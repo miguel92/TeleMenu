@@ -599,7 +599,8 @@ def listarValoraciones():
 def editarValoracion(id_valoracion):
     valoracion = AdminValoraciones.get(id_valoracion)
     datos = AdminValoraciones.update(request, id_valoracion)
-    if datos == 'True':
+    print(datos)
+    if datos is not None:
         return redirect(url_for("listarValoraciones"))
         
     listaVal = AdminValoraciones.getListaValoraciones()

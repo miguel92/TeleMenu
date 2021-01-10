@@ -421,7 +421,7 @@ class Comentario():
             comentario = request.form['text']
             clasificacion = request.form['contadorEstrellas']
 
-            user_id = session['id']
+            nombre = session['nombre']
             correo = session['user']
 
             if request.files['fotoComentario'].filename == '':
@@ -429,7 +429,7 @@ class Comentario():
             else:
                 urlFoto = Imagen().subirImagen(request, 'fotoComentario', request.form['entorno'])
 
-            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Restaurante": id_restaurante, "Texto": comentario, "Usuario": user_id, "Correo": correo}
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Restaurante": id_restaurante, "Texto": comentario, "Usuario": nombre, "Correo": correo}
             
             try:            
                 ComentarioModelo().crearComentario(data, firebase)
@@ -458,31 +458,28 @@ class AdminValoraciones():
     def update(request, id_valoracion):
         firebase = ConnectFirebase().firebase
         url = ['admin/editarValoracion.html', "defecto"]
-
+        update = None
         if request.method == 'POST':
             comentario = request.form['text']
             clasificacion = request.form['contadorEstrellas']
-
+            nombre = request.form['nombreUsuario']
             user_id = session['id']
             correo = session['user']
 
-            if request.files['fotoComentario'].filename == '':
-                urlFoto = "img/menu_placeholder2.jpg"
+            if request.files['fotoComentario'].filename != '':
+                urlFoto = Imagen().subirImagen(request,'fotoComentario',request.form['entorno'])
             else:
-                urlFoto = Imagen().subirImagen(request, 'fotoComentario', request.form['entorno'])
+                urlFoto = request.form["fotoActual"]
 
-            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Texto": comentario, "Usuario": user_id, "Correo": correo}
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Texto": comentario, "Usuario": nombre, "Correo": correo}
             
             try:            
                 update = ComentarioModelo().updateComentario(id_valoracion, data, firebase)
-                if (update == data):
-                    url[0] = 'True'
-                else:
-                    url[0] = 'False'
+                 
             except:
                 message = "No se ha podido crear"
-                url[1] = message
-        return url
+                
+        return update
 
     def delete(id_valoracion):
         firebase = ConnectFirebase().firebase

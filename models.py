@@ -362,9 +362,6 @@ class ComentarioModelo():
         db = firebase.database()
         comentarios = db.child("Valoraciones").get().val()
         for key in comentarios:
-            usuario = Usuario.getNombreById(comentarios[key]['Usuario'])
-            nombre = list(usuario.values())[0]['Nombre']
-            comentarios[key]['Nombre'] = nombre
             restaurante = Restaurante.get_restaurante(comentarios[key]['Restaurante'],firebase)
             comentarios[key]['NombreRestaurante'] = restaurante['Nombre']
         return comentarios
