@@ -165,10 +165,11 @@ class AdminRestaurantes():
             direccion = request.form['direccion']
             telefono = request.form['telefono']
 
-            if request.files['logoRestaurante'].filename == '':
-                urlFoto = "img/res_placeholder.jpg"
-            else:
+            if request.files['logoRestaurante'].filename != '':
                 urlFoto = Imagen().subirImagen(request,'logoRestaurante',request.form['entorno'])
+            else:
+                urlFoto = request.form["fotoActual"]
+                
                 
             data = {"Nombre": Nombre, "correo": correo, "descripcion": descripcion,
                     "direccion": direccion, "telefono": telefono, "logo": urlFoto}

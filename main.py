@@ -413,7 +413,7 @@ def editarRestauranteUser(id_user):
     datos = AdminRestaurantes.update(request, rest_key)
 
     if datos is not None:
-        return redirect(url_for('index'))
+        return redirect(url_for('root'))
 
     return render_template('admin/editarRestaurante.html', datos=rest_value)
 
