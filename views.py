@@ -231,7 +231,7 @@ class AdminMenus():
             ingredientes = request.form['ingredientes']
             tipoPlato = request.form['tipoPlato']
 
-            if session['id_restaurante']:
+            if session.get('id_restaurante'):
                 id_res = session['id_restaurante']
             else:
                 id_res = request.form['idRestaurante']
