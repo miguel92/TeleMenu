@@ -288,15 +288,21 @@ class misPedidos():
     def actualizarEstadoPedido(id_pedido):
         firebase = ConnectFirebase().firebase
         Pedido().actualizarEstadoPedido(id_pedido, firebase)
-    def anadirPedidocesta(pedido):
+    def anadirPedidocesta(pedido, id_restaurante):
         firebase = ConnectFirebase().firebase
-        Pedido().anadirPedidocesta(pedido, firebase)
+        correo = session["correo"]
+        session['cestaIdrestaurante'] = id_restaurante
+        Pedido().anadirPedidocesta(id_restaurante, pedido, firebase, correo)
     def getPedidosCesta():
         firebase = ConnectFirebase().firebase
-        return Pedido().getPedidosCesta(firebase)
-    def borrarCesta():
+        correo = session["correo"]
+        return Pedido().getPedidosCesta(firebase, correo)
+    def borrarCesta(id_cesta):
         firebase = ConnectFirebase().firebase
-        Pedido().borrarCesta(firebase)
+        Pedido().borrarCesta(firebase, id_cesta)
+    def borrarCestaUser():
+        firebase = ConnectFirebase().firebase
+        Pedido().borrarCestaUser(firebase, session['correo'])
         
 
 class listarRestaurantes():
@@ -317,9 +323,13 @@ class listarRestaurantes():
         Restaurante.update_restaurante(id_restaurante, firebase)
 
     @staticmethod
-    def getListaRestaurantes():
+    def getListaRestaurantes(request):
         firebase = ConnectFirebase().firebase
-        restaurantes = Restaurante.getRestaurantes(firebase)
+        if request.form:
+            texto = request.form['inputSearch']
+        else:
+            texto = None
+        restaurantes = Restaurante.getRestaurantes(firebase, texto)
         return restaurantes
 
     def getListaRestaurantesBusqueda(request):

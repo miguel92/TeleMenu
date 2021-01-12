@@ -55,10 +55,13 @@ app.secret_key = GOOGLE_CLIENT_SECRET
 def root():
     return render_template('wb.html', datos=None)
 
-@app.route('/searchLista')
+@app.route('/searchLista' , methods=["GET", "POST"])
 def searchLista():
-    restaurantes = listarRestaurantes.getListaRestaurantes()
-    return render_template('searchLista.html', datos=restaurantes)
+    restaurantes = listarRestaurantes.getListaRestaurantes(request)
+    if restaurantes:
+        return render_template('searchLista.html', datos=restaurantes)
+    else:
+        return render_template('searchLista.html', datos=None)
 
 
 @app.route('/map')
@@ -220,7 +223,7 @@ def listarMenusRestauranteWeb(id_restaurante):
     if len(menus) > 0:
         pedido = request.get_json()
         if (pedido is not None):
-            misPedidos.anadirPedidocesta(pedido)
+            misPedidos.anadirPedidocesta(pedido, id_restaurante)
         
         return render_template('listaMenusRestaurante.html', datos=menus,id_restaurante=id_restaurante, restaurante=restaurante, tiempo=tiempo, mediaValoracion= mediaValoracion)
     else:
@@ -233,7 +236,6 @@ def listaPedidos():
     pedido = request.get_json()
     if pedido is not None and pedido['value']['Estado']=='Exito':
         misPedidos.crearPedido(pedidosCesta, pedidosCesta['Restaurante'])
-        misPedidos.borrarCesta()
     if pedidosCesta is not None:
         return render_template('cestaPedido.html', datos=pedidosCesta)
     else:
@@ -242,7 +244,8 @@ def listaPedidos():
 
 @app.route("/vaciarCesta", methods=["GET", "POST"])
 def vaciarCesta():
-    misPedidos.borrarCesta()
+    pedidosCesta = misPedidos.getPedidosCesta()
+    misPedidos.borrarCestaUser()
     return render_template('cestaPedido.html', datos=None)
 
 @app.route("/pedidoRealizado", methods=["GET", "POST"])

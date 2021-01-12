@@ -6,6 +6,7 @@ import requests
 from flask_login import UserMixin
 from geopy.geocoders import Nominatim
 from googleplaces import GooglePlaces, types
+from flask import session
 
 
 class ConnectFirebase:
@@ -151,13 +152,22 @@ class Pedido():
     def actualizarEstadoPedido(self,id_pedido, firebase):
         db = firebase.database()
         pedido = db.child("Pedidos").child(id_pedido).update({"Estado" : "Terminado"})
-    def anadirPedidocesta(self,pedido, firebase):
+    def anadirPedidocesta(self,id_restaurante, pedido, firebase, correo):
         db = firebase.database()
+        print(session.get('cestaIdRestaurante'))
+        if session.get('cestaIdRestaurante'):
+            if session.get('cestaIdRestaurante') != id_restaurante:
+                self.borrarCestaUser(firebase, session.get('correo'))
+        
+        session['cestaIdRestaurante'] = id_restaurante        
+        pedido['correo'] = correo
+        pedido['Restaurante'] = id_restaurante
         db.child("Cesta").push(pedido)
-    def getPedidosCesta(self, firebase):
+
+    def getPedidosCesta(self, firebase, correo):
         db = firebase.database()
-        pedidosCesta = db.child("Cesta").get().val()
-        if (pedidosCesta is not None) :
+        pedidosCesta = db.child("Cesta").order_by_child("correo").equal_to(correo).get().val()
+        if (pedidosCesta != []) :
             pedidoCesta = {}
             cont=2
             total=0.0
@@ -171,19 +181,27 @@ class Pedido():
                     total = total +float(pedidosCesta[pedido]['pedido']['Precio'])
                     pedidoCesta['Restaurante'] = pedidosCesta[pedido]['pedido']['Restaurante']
             pedidoCesta['Total'] = total
+            pedidoCesta['key'] = list(pedidosCesta)[0]
             return pedidoCesta
         else:
             return None
-    def borrarCesta(self, firebase):
+    def borrarCesta(self, firebase, id_cesta):
         db = firebase.database()
-        db.child("Cesta").remove()
+        db.child("Cesta").child(id_cesta).remove()
     def getTotal(pedido):
         total=0.0
         for key in pedido:
             if key != 'Restaurante' and key != 'id': 
                 total = total + float(pedido[key])
         return total
-    
+    def borrarCestaUser(self, firebase, correo):
+        db = firebase.database()
+        cestaPedido = db.child("Cesta").order_by_child("correo").equal_to(correo).get().val()
+
+        for key in cestaPedido:
+            db.child("Cesta").child(key).remove()
+        
+
     '''
     @staticmethod
     def getPedidosRestaurante(id_restaurante, firebase, estado):
@@ -220,9 +238,33 @@ class Restaurante():
             user.remove()
         db.child("Restaurantes").child(id_restaurante).remove()
 
-    def getRestaurantes(firebase):
+    def getRestaurantes(firebase, texto):
         db = firebase.database()
-        restaurantes = db.child("Restaurantes").get().val()
+         
+        if texto is None:
+            restaurantes = db.child("Restaurantes").get().val()
+        else:
+            texto = texto.lower()
+            restaurantes = db.child("Restaurantes").get().val()
+            restaurantesNombre = {}
+            restaurantesDescripcion = {}
+            # Iteramos para pasar todos los nombres a minúsculas
+            for key in restaurantes:
+                if texto in restaurantes[key]['Nombre'].lower() or texto == restaurantes[key]['Nombre'].lower():
+                    restaurantesNombre[key]=restaurantes[key]
+                                       
+            for key in restaurantes:
+                if restaurantes[key].get('descripcion'):
+                    if texto in restaurantes[key]['descripcion'].lower() or texto == restaurantes[key]['descripcion'].lower():
+                        restaurantesDescripcion[key]=restaurantes[key]  
+            if restaurantesNombre and restaurantesDescripcion:
+                restaurantes = restaurantesNombre | restaurantesDescripcion
+            elif restaurantesNombre and restaurantesDescripcion=={}:
+                restaurantes = restaurantesNombre
+            elif restaurantesNombre=={} and restaurantesDescripcion:
+                restaurantes = restaurantesDescripcion
+            else:
+                restaurantes=[]
         return restaurantes
 
     @staticmethod
@@ -232,14 +274,19 @@ class Restaurante():
 
     @staticmethod
     def getRestaurantesBusqueda(texto, firebase):
-        db = firebase.database()
-        todosRestaurantes = db.child("Restaurantes").get().val()
         busquedaRestaurantes = []
-        for key, value in todosRestaurantes.items():
-            if value['Nombre'] in texto:
-                busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
-            elif value['Descripcion'] in texto:
-                busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
+        if texto == "":
+            db = firebase.database()
+            todosRestaurantes = db.child("Restaurantes").get().val()
+
+            for key, value in todosRestaurantes.items():
+                if value['Nombre'] in texto:
+                    busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
+                elif value['Descripcion'] in texto:
+                    busquedaRestaurantes.append([value['Nombre'], value['Descripcion']])
+        else:
+            busquedaRestaurantesInicial = db.child('Restaurantes').order_by_child('Nombre')._start_at(texto).end_at(texto+'\uf8ff').get().val()
+            print(busquedaRestaurantesInicial)
         return busquedaRestaurantes
 
     @staticmethod
