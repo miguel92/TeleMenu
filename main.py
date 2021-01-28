@@ -236,6 +236,7 @@ def listaPedidos():
     pedido = request.get_json()
     if pedido is not None and pedido['value']['Estado']=='Exito':
         misPedidos.crearPedido(pedidosCesta, pedidosCesta['Restaurante'])
+        misPedidos.borrarCestaUser()
     if pedidosCesta is not None:
         return render_template('cestaPedido.html', datos=pedidosCesta)
     else:
