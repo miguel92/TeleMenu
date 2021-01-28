@@ -97,12 +97,13 @@
 				        	
 				        	<a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
 				        	{% if value['Comentado'] == 'no' %}
-				        	<a href="/comentarPedido/{{value['Restaurante']}}"><i class="far fa-comment-dots"></i></a>
+				        	<a href="/comentarPedido/{{value['Restaurante']}}/{{key}}"><i class="far fa-comment-dots"></i></a>
 				        	{% endif %}
 				        </td>
 				      </tr>
 				      {% endif %}
 				      </tr>
+				      
 				     {%endfor%}
                     </tbody>
                 </table>

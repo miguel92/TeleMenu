@@ -423,8 +423,9 @@ class Imagen():
         return(url_upto_apikey)        
 
 class Comentario():
-    def crearComentario(self, request, id_restaurante):
+    def crearComentario(self, request, id_restaurante, key_pedido):
         firebase = ConnectFirebase().firebase
+        
         url = ['crearMenu.html', None]
 
         if request.method == 'POST':
@@ -442,7 +443,7 @@ class Comentario():
             data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Restaurante": id_restaurante, "Texto": comentario, "Usuario": nombre, "Correo": correo}
             
             try:            
-                ComentarioModelo().crearComentario(data, firebase)
+                ComentarioModelo().crearComentario(data, firebase, key_pedido)
                 url[0] = 'comentarioRealizado.html'
             except:
                 message = "No se ha podido crear"

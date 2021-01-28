@@ -379,10 +379,11 @@ class Restaurante():
         return descripcion[aqi - 1]
 
 class ComentarioModelo():
-    def crearComentario(self, data, firebase):
+    def crearComentario(self, data, firebase, key_pedido):
         db = firebase.database()
         data['Fecha'] = now = time.strftime("%d/%m/%y")
         db.child("Valoraciones").push(data)
+        db.child("Pedidos").child(key_pedido).update({"Comentado": "si"})
     def getValoracionMedia(self, id_restaurante, firebase):
         db = firebase.database()
         valoraciones = db.child("Valoraciones").order_by_child("Restaurante").equal_to(id_restaurante).get().val()

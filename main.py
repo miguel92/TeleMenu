@@ -579,11 +579,11 @@ def testimg():
     Imagen().subirImagen(request);
     return render_template('testimg.html', datos = url)
 
-@app.route('/comentarPedido/<id_restaurante>', methods=["GET", "POST"])
-def comentarPedido(id_restaurante):
+@app.route('/comentarPedido/<id_restaurante>/<key_pedido>', methods=["GET", "POST"])
+def comentarPedido(id_restaurante, key_pedido):
     restaurante = listarRestaurantes.get_restaurante(id_restaurante)
     nombreRestaurante = restaurante['Nombre']
-    datos = Comentario().crearComentario(request, id_restaurante)
+    datos = Comentario().crearComentario(request, id_restaurante, key_pedido)
     if (datos[0] == 'comentarioRealizado.html'):
         return render_template('comentarioRealizado.html')
     else:
