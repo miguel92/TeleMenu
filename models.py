@@ -228,14 +228,6 @@ class Restaurante():
     @staticmethod
     def delete_restaurante(id_restaurante, firebase):
         db = firebase.database()
-        rest = db.child("Restaurantes").child(id_restaurante)
-        email = rest.get().val()['correo']
-        menus = Restaurante.getMenusRestaurante(id_restaurante, firebase)
-        for menu in menus:
-            Menu.deleteMenu(menu, firebase)
-        user = db.child("Usuarios").order_by_child("correo").equal_to(email)
-        if user.get().val():
-            user.remove()
         db.child("Restaurantes").child(id_restaurante).remove()
 
     def getRestaurantes(firebase, texto = None):
@@ -248,7 +240,7 @@ class Restaurante():
             restaurantes = db.child("Restaurantes").get().val()
             restaurantesNombre = {}
             restaurantesDescripcion = {}
-            # Iteramos para pasar todos los nombres a minúsculas
+            # Iteramos para pasar todos los nombres a minï¿½sculas
             for key in restaurantes:
                 if texto in restaurantes[key]['Nombre'].lower() or texto == restaurantes[key]['Nombre'].lower():
                     restaurantesNombre[key]=restaurantes[key]
