@@ -232,7 +232,7 @@ class Restaurante():
         email = rest.get().val()['correo']
         menus = Restaurante.getMenusRestaurante(id_restaurante, firebase)
         for menu in menus:
-            Menu.deleteMenu(menu, firebase)
+            Menu().deleteMenu(menu, firebase)
         user = db.child("Usuarios").order_by_child("correo").equal_to(email)
         if user.get().val():
             user.remove()

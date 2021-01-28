@@ -423,8 +423,8 @@ def editarRestauranteUser(id_user):
 
 @app.route('/borrarRestaurante/<id_restaurante>', methods=["GET", "POST"])
 def borrarRestaurante(id_restaurante):
-    AdminRestaurantes.delete(id_restaurante)
-    return redirect(url_for('listarRestaurantes'))
+    ##AdminRestaurantes.delete(id_restaurante)
+    return redirect(url_for('listarRestaurantesWeb'))
 
 
 @app.route('/loginGoogle', methods=["GET", "POST"])
