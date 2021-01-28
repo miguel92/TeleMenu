@@ -139,7 +139,7 @@ class Pedido():
         total = list(pedido)[0]
         coordenadas = Usuario().getCoordDireccion(user_id, firebase)
         coordenadas = [coordenadas.latitude, coordenadas.longitude]
-        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido, "Restaurante": id_restaurante, "Coordenadas": coordenadas, "Direccion": direccion}
+        data = {"Cliente": user_id, "Estado": "Pendiente", "Fecha":now, "Hora": hora,"Pedido":pedido, "Restaurante": id_restaurante, "Coordenadas": coordenadas, "Direccion": direccion, "Comentado": "no"}
         db.child("Pedidos").push(data)
     def getPedidosRestaurante(self,user_id, firebase):
         db = firebase.database()

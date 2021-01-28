@@ -35,7 +35,7 @@
 				      <tr>
 				      	{% if value['Pedido'] != "Restaurante" %}
 				        <td>{% for key in value['Pedido'].keys() %}
-				        {%if key != 'Restaurante'%} 
+				        {%if key != 'Restaurante' and key != 'key' %} 
 				        {%if key == 'Total'%}
 				        <em>{{key}}: {{value['Pedido'][key]}} Eur.</em>
 				        {%else%}
@@ -78,7 +78,7 @@
 				      <tr>
 				      	{% if value['Pedido'] != "Restaurante" %}
 				        <td>{% for key in value['Pedido'].keys() %}
-				        {%if key != 'Restaurante'%} 
+				        {%if key != 'Restaurante' and key != 'key'%} 
 				        {%if key == 'Total'%}
 				        <em>{{key}}: {{value['Pedido'][key]}} Eur.</em>
 				        {%else%}
@@ -94,8 +94,11 @@
 				        	{{datos2[key]['Fecha']}}
 				        </td>
 				        <td>
+				        	
 				        	<a href="/borrarPedido/{{ key }}"><i class="fas fa-trash"></i></a>
+				        	{% if value['Comentado'] == 'no' %}
 				        	<a href="/comentarPedido/{{value['Restaurante']}}"><i class="far fa-comment-dots"></i></a>
+				        	{% endif %}
 				        </td>
 				      </tr>
 				      {% endif %}

@@ -98,6 +98,7 @@ def pedidosCliente():
     pedidosPendientes = misPedidos.getMisPedidos("Pendiente")
     pedidosTerminados = misPedidos.getMisPedidos("Terminado")
     print(pedidosTerminados)
+    print(pedidosTerminados)
     if len(pedidosPendientes) > 0 and len(pedidosTerminados) >0:
         return render_template('pedidos.html', datos=pedidosPendientes, datos2=pedidosTerminados)
     elif len(pedidosPendientes) > 0 and len(pedidosTerminados) ==0:
