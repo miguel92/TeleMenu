@@ -238,7 +238,7 @@ class Restaurante():
             user.remove()
         db.child("Restaurantes").child(id_restaurante).remove()
 
-    def getRestaurantes(firebase, texto):
+    def getRestaurantes(firebase, texto = None):
         db = firebase.database()
          
         if texto is None:
