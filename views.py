@@ -178,8 +178,7 @@ class AdminRestaurantes():
 
     def delete(id_usuario):
         firebase = ConnectFirebase().firebase
-        Usuario().deleteUsuario(id_usuario, firebase)
-
+        Restaurante.delete_restaurante(id_usuario, firebase)
 
 class AdminMenus():
     @staticmethod
