@@ -5,7 +5,7 @@
         .topnav {
             overflow: hidden;
             background-color: #333;
-            width: 13.8%;
+            display:inline-block;
         }
 
         .topnav a {
@@ -28,9 +28,9 @@
         }
     </style>
     <div class="topnav">
-        <a class="active" href="/searchLista">Listado</a>
+        	<a class="active" href="/searchLista">Listado</a>
         {% if session['user'] %}
-        <a href="/map">Mapa</a>
+        	<a href="/map">Mapa</a>
         {%endif %}
     </div>
 
