@@ -68,15 +68,22 @@
 					                    </div>
                                     </div>
                 
-                <div class="custom-file">
+                
+
+                
+                
+                <div class="form-group">
                   
-                    
-                    <label class="custom-file-label" for="logoRestaurante">Logo del restaurante</label>
+      
+                    <label class="control-label  col-sm-3" for="logoRestaurante">Logo del restaurante</label>
+                    	<div class="col-sm-6">
                     <input type="file" name="logoRestaurante" class="custom-file-input" id="logoRestaurante"
                            value="{{ datos['logo'] }}">
+                           
                     <input type="hidden" name="fotoActual" value="{{datos['logo']}}">
                     <input type="hidden" name="entorno" value="" id="varEntorno">
-                    <div class="invalid-feedback">Example invalid custom file feedback</div>
+                    </div>
+                   
                 </div>
 
                 <div class="form-group text-center">
