@@ -131,3 +131,17 @@ color:black;
 .desplegable a {
 	color: black !important;
 }
+.indicador-cesta{
+	position: absolute;
+    border-radius: 13px;
+    background: blue;
+    color: white;
+    display: inline-block;
+    width: 12px;
+    font-size: 12px;
+    height: 12px;
+    padding-left: 2.5px;
+    line-height: 14px;
+    left: 25px;
+    top: 17px;
+}
