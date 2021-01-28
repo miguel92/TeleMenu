@@ -64,11 +64,18 @@
 
                                 <p><i>{{ value['Ingredientes'] }}</i></p>
                                 <p><strong>Precio:</strong> {{ value['Precio'] }} Eur.</p>
-
+								{% if session['user'] %}
+								{% if session['rol'] == 'restaurante' %}
+								<p><strong>No puede a&ntilde;adir men&uacute;s porque tu perfil es de restaurante.</strong></p>
+								{% endif %}
+								{% if session['rol'] == 'cliente' %}
                                 <p align="right"><input type="button" value="A&ntilde;adir al pedido"
                                                         class="btn btn-success"
                                                         onclick="agregarPedido('{{value['Nombre']}}', '{{value['Precio']}}')"/></p>
-
+                                {% endif %}
+                                {% else %}
+                                <p><strong>Para a&ntilde;adir men&uacute;s, debes iniciar sesi&oacute;n.</strong></p>
+                                {% endif %}
                             </a>
                         </div>
                     </div>
