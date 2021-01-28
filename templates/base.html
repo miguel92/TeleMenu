@@ -86,31 +86,36 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% block menu %}
-
-                    {% if session['user'] %}
-                  		<li>
-                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <i class="fas fa-user-cog icono_enlace"></i>Ajustes</a>
-                        </li>
-                        <li>
-                   <a href="/salir"> <i class="fas fa-sign-out-alt icono_enlace"></i> Logout</a>
-                </li>          
-                                <!-- Solo visible para administradores del sitio -->
-                {% if session['rol'] == 'administrador' %}
-                <li>
-                   <a href="/admin"> <span class="glyphicon glyphicon-wrench icono_enlace" aria-hidden="true"></span> Administrar</a>
-                </li>
-
-                {% endif %}
+                {% if session['user'] %}
+                	<li class="dropdown" style="padding-top:6px;">
+	                	<a class="dropdown-toggle navbar-color" data-toggle="dropdown" href="#"><img class="icono-perfil" src="{{session['picture']}}">{{session['nombre']}}
+	        			<span class="caret"></span></a>
+		                <ul class="dropdown-menu desplegable" >
+					          	{% if session['user'] %}
+			                  		<li>
+			                            <a href="/editarUsuarioR/{{ session['user_id'] }}"> <i class="fas fa-user-cog icono_enlace"></i>Ajustes</a>
+			                        </li>
+			                    {% endif %}
+				          </li>
+				           <!-- Solo visible para administradores del sitio -->
+			                {% if session['rol'] == 'administrador' %}
+			                <li>
+			                   <a href="/admin"><i class="fas fa-wrench icono_enlace"></i> Administrar</a>
+			                </li>
+			
+			                {% endif %}
+				          <li>
+			                   <a href="/salir"> <i class="fas fa-sign-out-alt icono_enlace"></i> Logout</a>
+			              </li> 
+				        </ul>
+					</li>            
                 {% else %}
                 <li>
-                <!--   <a data-toggle="modal" data-target="#modalLoginForm" href=""> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a> -->
                  <a href="/login"> <span class="glyphicon glyphicon-log-in icono_enlace" aria-hidden="true" ></span> Login</a>
-                 
                 </li>
                 {% endif %}
                 {% endblock %}
                 
-
             </ul>
         </div>
         <!-- /.navbar-collapse -->

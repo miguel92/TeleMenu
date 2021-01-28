@@ -1,0 +1,42 @@
+{% extends "admin/main.html" %}
+{% block body %}
+    {% if datos is not none %}
+    <div class="col-lg-12 text-center">
+        <h3>Tabla de Valoraciones</h3>
+        </div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Restaurante</th>
+                <th>Fecha</th>
+
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for key, value in datos.items() %}
+                <tr>
+                    <td>{{ value['Usuario'] }}</td>
+                    <td>{{ value['NombreRestaurante'] }}</td>
+                    <td>{{ value['Fecha'] }}</td>
+                    <td>
+
+
+                        <a href="/editarValoracion/{{ key }}"><i class="fas fa-edit"></i></a>
+
+                        <a href="/borrarValoracion/{{ key }}"><i class="fas fa-trash"></i></a>
+                    </td>
+
+
+                </tr>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h3>No hay Usuarios creados</h3>
+    {% endif %}
+
+
+{% endblock %}

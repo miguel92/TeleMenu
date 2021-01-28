@@ -1,0 +1,95 @@
+{% extends "admin/main.html" %}
+{% block body %}
+
+	<h3>Valoraci&oacute;n</h3>
+	<div class="row">
+    <div class="col-md-12">
+        <form id="submit-form" class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data" >
+            <div class="form-group">
+            {%for key,value in datos.items()%}
+                <label for="nombreRestaurante" class="col-sm-3 control-label">Restaurante</label>
+                <div class="col-sm-6">
+                    <span class="form-control-text">{{value['NombreRestaurante']}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="comentario" class="col-sm-3 control-label">Comentario</label>
+                <div class="col-sm-6">
+			         <textarea id="comentario" style="resize:none;" rows="5" cols="64" name="text">{{value['Texto']}}</textarea>
+      				<br/>
+                </div>
+            </div>
+			
+			<div class="form-group">
+                <label for="ingredientes" class="col-sm-3 control-label">Valoraci&oacute;n</label>
+                <div class="col-sm-6">
+			        <div >
+			        	<input type="hidden" id="contadorEstrellasInicial" value="{{value['Clasificacion']}}" id="contEstrellas">
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="1"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="2"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="3"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="4"></span>
+						<span class="fa fa-star estrella"  style="cursor:pointer" data-star="5"></span>
+						<input type="hidden" name="contadorEstrellas" value="" id="contEstrellas">
+			        </div>
+			    </div>
+            </div>
+            <div class="custom-file">
+                    <div class="row">
+                                      <div class="col-md-2"></div>
+                                      <div class="col-md-8">
+		                                {% if value["Foto"] == "img/menu_placeholder2.jpg" %}
+					                    	{% set src = url_for('static', filename='') + value["Foto"] %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ '../'+src }}">
+					                    {% else %}
+					                    	{% set src = value["Foto"] %}
+					                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ src }}">
+					                    {% endif %}
+					                    <div class="col-md-2"></div>
+					                    </div>
+                                    </div>
+	            <div class="form-group">
+		              		<label class="control-label col-sm-3" for="fotoComentario">Imagen al comentario</label>
+		              		<div class="col-sm-6">
+		              		<input type="hidden" name="entorno" value="" id="varEntorno">
+		              		<input type="hidden" name="nombreUsuario" value="{{value['Usuario']}}">
+		              		<input type="hidden" name="fotoActual" value="{{value['Foto']}}">
+						    <input type="file" name="fotoComentario" class="custom-file-input" id="fotoComentario" value="{{value['Foto']}}">
+						    </div> 		
+				</div>
+            	 </div>
+            
+            <div class="form-group text-center">
+                <button id="botonActualizar" type="submit" value="submit" class="btn btn-warning">Actualizar</button>
+                <div class='error' style='display:none; width:200px;height:20px;height:auto;position:fixed;background-color: #383838;left:50%;margin-left:-50px;color: #F0F0F0;top:60px;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);'>Valoraci&oacute;n actualizada.</div>
+                <!-- <a class="btn btn-danger" href ="/delete">Eliminar</a> -->
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascript%}
+	$("#varEntorno").val(window.location.hostname);
+	var contador;
+	if ($("#contadorEstrellasInicial").val()){
+		contador = $("#contadorEstrellasInicial").val();
+	}
+	
+	$(".estrella").removeClass("checked");
+		for(var i = 0; i <= contador; i++){
+			$("span[data-star='"+i+"']").addClass("checked");
+	}
+	
+	$(".estrella").click(function(){
+		contador = $(this).attr("data-star");
+		$(".estrella").removeClass("checked");
+		for(var i = 0; i <= contador; i++){
+			$("span[data-star='"+i+"']").addClass("checked");
+		}
+		$("#contEstrellas").val(contador);
+	});
+	$("#contEstrellas").val(contador);
+	
+{% endblock javascript%}

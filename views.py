@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante
+from models import ConnectFirebase, Usuario, Menu, Pedido, Restaurante, ComentarioModelo
 import firebase,os
 from auth_img import Flickr
 import flickr_api, requests,json
@@ -165,10 +165,11 @@ class AdminRestaurantes():
             direccion = request.form['direccion']
             telefono = request.form['telefono']
 
-            if request.files['logoRestaurante'].filename == '':
-                urlFoto = "img/res_placeholder.jpg"
-            else:
+            if request.files['logoRestaurante'].filename != '':
                 urlFoto = Imagen().subirImagen(request,'logoRestaurante',request.form['entorno'])
+            else:
+                urlFoto = request.form["fotoActual"]
+                
                 
             data = {"Nombre": Nombre, "correo": correo, "descripcion": descripcion,
                     "direccion": direccion, "telefono": telefono, "logo": urlFoto}
@@ -214,7 +215,6 @@ class AdminMenus():
 
             data = {"Nombre": nombre, "Ingredientes": ingredientes, "Tipo": tipoPlato, "Precio": precio,
                     "Foto": urlFoto, "Restaurante": id_res}
-            print(data)
             datos = Menu().updateMenu(id_menu, data, firebase)
             return datos
 
@@ -232,7 +232,7 @@ class AdminMenus():
             ingredientes = request.form['ingredientes']
             tipoPlato = request.form['tipoPlato']
 
-            if session['id_restaurante']:
+            if session.get('id_restaurante'):
                 id_res = session['id_restaurante']
             else:
                 id_res = request.form['idRestaurante']
@@ -289,15 +289,21 @@ class misPedidos():
     def actualizarEstadoPedido(id_pedido):
         firebase = ConnectFirebase().firebase
         Pedido().actualizarEstadoPedido(id_pedido, firebase)
-    def anadirPedidocesta(pedido):
+    def anadirPedidocesta(pedido, id_restaurante):
         firebase = ConnectFirebase().firebase
-        Pedido().anadirPedidocesta(pedido, firebase)
+        correo = session["correo"]
+        session['cestaIdrestaurante'] = id_restaurante
+        Pedido().anadirPedidocesta(id_restaurante, pedido, firebase, correo)
     def getPedidosCesta():
         firebase = ConnectFirebase().firebase
-        return Pedido().getPedidosCesta(firebase)
-    def borrarCesta():
+        correo = session["correo"]
+        return Pedido().getPedidosCesta(firebase, correo)
+    def borrarCesta(id_cesta):
         firebase = ConnectFirebase().firebase
-        Pedido().borrarCesta(firebase)
+        Pedido().borrarCesta(firebase, id_cesta)
+    def borrarCestaUser():
+        firebase = ConnectFirebase().firebase
+        Pedido().borrarCestaUser(firebase, session['correo'])
         
 
 class listarRestaurantes():
@@ -318,9 +324,13 @@ class listarRestaurantes():
         Restaurante.update_restaurante(id_restaurante, firebase)
 
     @staticmethod
-    def getListaRestaurantes():
+    def getListaRestaurantes(request):
         firebase = ConnectFirebase().firebase
-        restaurantes = Restaurante.getRestaurantes(firebase)
+        if request.form:
+            texto = request.form['inputSearch']
+        else:
+            texto = None
+        restaurantes = Restaurante.getRestaurantes(firebase, texto)
         return restaurantes
 
     def getListaRestaurantesBusqueda(request):
@@ -412,3 +422,76 @@ class Imagen():
                            "&user_id=" +  user_id +
                            "&format=json&nojsoncallback=1")
         return(url_upto_apikey)        
+
+class Comentario():
+    def crearComentario(self, request, id_restaurante):
+        firebase = ConnectFirebase().firebase
+        url = ['crearMenu.html', None]
+
+        if request.method == 'POST':
+            comentario = request.form['text']
+            clasificacion = request.form['contadorEstrellas']
+
+            nombre = session['nombre']
+            correo = session['user']
+
+            if request.files['fotoComentario'].filename == '':
+                urlFoto = "img/menu_placeholder2.jpg"
+            else:
+                urlFoto = Imagen().subirImagen(request, 'fotoComentario', request.form['entorno'])
+
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Restaurante": id_restaurante, "Texto": comentario, "Usuario": nombre, "Correo": correo}
+            
+            try:            
+                ComentarioModelo().crearComentario(data, firebase)
+                url[0] = 'comentarioRealizado.html'
+            except:
+                message = "No se ha podido crear"
+                url[1] = message
+        return url
+    def getValoracionMedia(id_restaurante):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getValoracionMedia(id_restaurante, firebase)
+    def getComentarios(self, id_restaurante):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getComentarios(id_restaurante, firebase)
+    
+class AdminValoraciones():
+    @staticmethod
+    def getListaValoraciones():
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getAllComentarios(firebase)
+
+    def get(id_valoracion):
+        firebase = ConnectFirebase().firebase
+        return ComentarioModelo().getValoracion(id_valoracion, firebase)
+
+    def update(request, id_valoracion):
+        firebase = ConnectFirebase().firebase
+        url = ['admin/editarValoracion.html', "defecto"]
+        update = None
+        if request.method == 'POST':
+            comentario = request.form['text']
+            clasificacion = request.form['contadorEstrellas']
+            nombre = request.form['nombreUsuario']
+            user_id = session['id']
+            correo = session['user']
+
+            if request.files['fotoComentario'].filename != '':
+                urlFoto = Imagen().subirImagen(request,'fotoComentario',request.form['entorno'])
+            else:
+                urlFoto = request.form["fotoActual"]
+
+            data = {"Clasificacion": clasificacion,"Foto": urlFoto, "Texto": comentario, "Usuario": nombre, "Correo": correo}
+            
+            try:            
+                update = ComentarioModelo().updateComentario(id_valoracion, data, firebase)
+                 
+            except:
+                message = "No se ha podido crear"
+                
+        return update
+
+    def delete(id_valoracion):
+        firebase = ConnectFirebase().firebase
+        ComentarioModelo().deleteValoracion(id_valoracion, firebase)

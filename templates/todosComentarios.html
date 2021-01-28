@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+	<div class="col-md-offset-2 col-sm-8">
+	<h3 id="nombreRestaurante"><strong>{{nombre}}</strong></h3>
+	{% for key, value in datos.items() %}
+			<ul id="ulListaPedido" class="list-group" style="visibility: visible;list-style-type:none;">
+				<li>
+					<div class="list-group-item">
+						<p id="haPedido" style="visibility: visible;"><strong>{{datos[key]['Correo']}}</strong></p>
+						<p id="haPedido" style="visibility: visible;">"{{datos[key]['Texto']}}"</p>
+						{% if datos[key]['Foto'] != "img/menu_placeholder2.jpg" %}
+		                    	{% set src = value["Foto"] %}
+		                    	<img class="img-responsive img-thumbnail imagen_menu" src="{{ src }}">
+		                {% endif %}
+						<p data-star="{{datos[key]['Clasificacion']}}" class="star" id="fixture{{loop.index}}" style="visibility: visible;font-size:22px;"></p>
+					</div>
+				</li>
+			</ul>
+	{%endfor%}
+	
+	</div>
+
+
+
+{% endblock %}
+{% block javascript %}
+		function addScoreAll(){
+			for(var i = 1 ; i <= {{longitud}};i++){
+				addScore(i);
+			}
+		}
+	  function addScore(posicion) {
+	    contador = $("#fixture"+posicion).attr("data-star");
+		score = contador * 100/5;
+	    $("<span class='stars-container'>")
+	      .addClass("stars-" + score.toString())
+	      .text("★★★★★")
+	      .appendTo($('#fixture'+posicion));
+	      
+	  }
+	  
+	  addScoreAll();
+	  
+{% endblock javascript%}

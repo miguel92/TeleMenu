@@ -7,7 +7,7 @@
 	<h4>Tu cesta est&aacute; vac&iacute;a</h4>
 	{% else %}
 	{% for key, value in datos.items() %}
-		{% if key != "Restaurante" and key != "Total" %}
+		{% if key != "Restaurante" and key != "Total" and key != 'key' %}
 			<ul id="ulListaPedido" class="list-group" style="visibility: visible;">
 				<a href="#1" class="list-group-item">
 				
