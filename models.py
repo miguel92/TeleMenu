@@ -154,15 +154,18 @@ class Pedido():
         pedido = db.child("Pedidos").child(id_pedido).update({"Estado" : "Terminado"})
     def anadirPedidocesta(self,id_restaurante, pedido, firebase, correo):
         db = firebase.database()
-        print(session.get('cestaIdRestaurante'))
+        
         if session.get('cestaIdRestaurante'):
             if session.get('cestaIdRestaurante') != id_restaurante:
                 self.borrarCestaUser(firebase, session.get('correo'))
+                session['numItems'] = 0
         
-        session['cestaIdRestaurante'] = id_restaurante        
+        session['cestaIdRestaurante'] = id_restaurante
+        session['numItems'] = session['numItems']+1        
         pedido['correo'] = correo
         pedido['Restaurante'] = id_restaurante
         db.child("Cesta").push(pedido)
+        return session['numItems']
 
     def getPedidosCesta(self, firebase, correo):
         db = firebase.database()

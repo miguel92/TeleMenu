@@ -223,7 +223,10 @@ def listarMenusRestauranteWeb(id_restaurante):
     if len(menus) > 0:
         pedido = request.get_json()
         if (pedido is not None):
-            misPedidos.anadirPedidocesta(pedido, id_restaurante)
+            numItems = misPedidos.anadirPedidocesta(pedido, id_restaurante)
+            data = {"numItems" : numItems}
+            data = json.dumps(data)
+            return data
         
         return render_template('listaMenusRestaurante.html', datos=menus,id_restaurante=id_restaurante, restaurante=restaurante, tiempo=tiempo, mediaValoracion= mediaValoracion)
     else:
@@ -529,6 +532,7 @@ def callback():
     session['id'] = unique_id
     session['correo'] = users_email
     session['picture'] = picture
+    session['numItems'] = 0
 
 
     if user_by_id == []:
@@ -565,6 +569,7 @@ def salir():
     session.pop('rol', None)
     session.pop('id', None)
     session.pop('correo', None)
+    session.pop('numItems',None)
     session.clear()
     return redirect(url_for("root"))
 

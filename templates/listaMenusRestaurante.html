@@ -27,8 +27,9 @@
 						<p id="fixture" style="visibility: visible;">Valoraci&oacute;n media: <div id="fixture" style="size:50"></div>
 							
 						</p>
-	                    <p align="left"><a href="/todosComentarios/{{id_restaurante}}"><input href="/todosComentarios" type="button" value="Ver todos los comentarios"
-	                                       class="btn btn-success"/></p>
+	                    <p align="left">
+	                    	<a  class="btn btn-success" href="/todosComentarios/{{id_restaurante}}">Ver todos los comentarios</a>
+	                    </p>
 	                </div>
 					{% endif %}
 			{% endif %}
@@ -102,13 +103,13 @@
 	          data: JSON.stringify({pedido}),
 	          dataType: "json",
 	          success: function(data, textStatus){
-	        	  if (data.redirect){
-	        		  
-	        		  window.location.href = data.redirect;
+	        	  if(data){
+	        		  $('.indicador-cesta').text(data.numItems);
 	        	  }
 	          }
 	          });
 		
+   	
 	}
 	</script>
 {% endblock %}

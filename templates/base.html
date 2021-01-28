@@ -78,7 +78,8 @@
 	                   <a href="/pedidosCliente"> <span class="fas fa-utensils icono_enlace" aria-hidden="true"></span> Mis pedidos</a>
 	                </li>
 	                <li>
-	                   <a href="/cestaPedido"> <i class="fas fa-shopping-cart icono_enlace" aria-hidden="true"></i> Lista de pedidos</a>
+	                   
+	                   <a href="/cestaPedido"> <i class="fas fa-shopping-cart icono_enlace" aria-hidden="true"></i><span class="indicador-cesta">{{session['numItems']}}</span> Cesta</a>
 	                </li>	                
                  {% endif %}
                 {% endif %}

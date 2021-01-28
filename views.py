@@ -291,8 +291,8 @@ class misPedidos():
     def anadirPedidocesta(pedido, id_restaurante):
         firebase = ConnectFirebase().firebase
         correo = session["correo"]
-        session['cestaIdrestaurante'] = id_restaurante
-        Pedido().anadirPedidocesta(id_restaurante, pedido, firebase, correo)
+        numItems = Pedido().anadirPedidocesta(id_restaurante, pedido, firebase, correo)
+        return numItems
     def getPedidosCesta():
         firebase = ConnectFirebase().firebase
         correo = session["correo"]
@@ -302,6 +302,7 @@ class misPedidos():
         Pedido().borrarCesta(firebase, id_cesta)
     def borrarCestaUser():
         firebase = ConnectFirebase().firebase
+        session['numItems'] = 0
         Pedido().borrarCestaUser(firebase, session['correo'])
         
 
